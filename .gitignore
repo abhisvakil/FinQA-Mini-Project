@@ -1,0 +1,53 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Data files
+data/*.json
+!data/.gitkeep
+
+# Model checkpoints
+models/**/*.pt
+models/**/*.pth
+models/**/*.bin
+models/**/*.ckpt
+checkpoints/
+
+# Results
+results/**/*
+!results/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# FinQA repository (if cloned)
+FinQA/
+
+# API keys
+.env
+*.key
+config.ini
+
