@@ -1,0 +1,68 @@
+# LoRA Configuration for FinQA Training
+
+# LoRA Parameters
+lora:
+  r: 8  # Rank (can try 4, 8, 16, 32)
+  lora_alpha: 16  # Scaling factor
+  target_modules:
+    - q_proj  # Query projection
+    - v_proj  # Value projection
+    # Optionally add:
+    # - k_proj  # Key projection
+    # - o_proj  # Output projection
+    # - gate_proj  # For Llama/Mistral
+    # - up_proj
+    # - down_proj
+  lora_dropout: 0.05
+  bias: "none"  # Can be "none", "all", or "lora_only"
+  task_type: "CAUSAL_LM"
+
+# Training Hyperparameters
+training:
+  output_dir: "./results/lora"
+  num_train_epochs: 3
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 4  # Effective batch size = 4 * 4 = 16
+  learning_rate: 2e-4
+  weight_decay: 0.01
+  warmup_steps: 100
+  lr_scheduler_type: "cosine"
+  
+  # Evaluation and Saving
+  evaluation_strategy: "steps"
+  eval_steps: 250
+  save_strategy: "steps"
+  save_steps: 500
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  
+  # Optimization
+  fp16: false  # Set to true if GPU supports it
+  bf16: true   # Better for newer GPUs (A100, H100)
+  optim: "adamw_torch"
+  max_grad_norm: 1.0
+  
+  # Logging
+  logging_steps: 50
+  logging_dir: "./logs/lora"
+  report_to: "tensorboard"
+  
+  # Misc
+  max_seq_length: 2048
+  seed: 42
+  dataloader_num_workers: 4
+
+# Data Configuration
+data:
+  train_file: "data/train.json"
+  dev_file: "data/dev.json"
+  test_file: "data/test.json"
+  max_samples: null  # Set to a number for quick testing (e.g., 1000)
+  
+# Model Configuration
+model:
+  model_name_or_path: "meta-llama/Meta-Llama-3-8B-Instruct"  # Or use mistralai/Mistral-7B-Instruct-v0.2
+  torch_dtype: "bfloat16"
+  device_map: "auto"

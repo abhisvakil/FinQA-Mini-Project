@@ -2,34 +2,61 @@
 
 ## Project Overview
 
-This project implements a system for automated analysis of complex financial reports, answering numerical questions by generating executable, step-by-step reasoning programs. We compare a fine-tuned specialist model against a large general-purpose in-context learning (ICL) model.
+This project implements a system for automated analysis of complex financial reports, answering numerical questions by generating executable, step-by-step reasoning programs. We compare **Parameter-Efficient Fine-Tuning (PEFT)** methods (LoRA/QLoRA) against **In-Context Learning (ICL)** across 2-4 open-source language models.
+
+### Approach
+- **PEFT Methods**: LoRA (Low-Rank Adaptation) and QLoRA (Quantized LoRA) for efficient fine-tuning
+  - Models: **Llama-3-8B** and **Mistral-7B** (optimal size for fine-tuning)
+- **ICL**: Few-shot prompting without fine-tuning
+  - Models: **Llama-3-70B** and **Qwen-2.5-72B** (larger models for better reasoning)
+- **Evaluation**: Compare accuracy, efficiency, and reasoning quality across methods
 
 ## Project Structure
 
 ```
-LLM_Mini_Project/
-├── data/                    # Dataset files (to be downloaded)
-├── models/                  # Model implementations
-│   ├── retriever/          # Retriever module
-│   ├── generator/          # Program generator
-│   ├── specialist/         # Fine-tuned specialist model
-│   └── icl/                # ICL model implementation
+FinQA-Mini-Project/
+├── data/                    # Dataset files
+│   ├── train.json          # Training data
+│   ├── dev.json            # Development/validation data
+│   └── test.json           # Test data
 ├── src/                    # Core source code
 │   ├── data_loader.py      # Data loading utilities
-│   ├── preprocess.py       # Data preprocessing
 │   ├── executor.py         # Program executor
-│   └── evaluate.py         # Evaluation metrics
-├── notebooks/              # Jupyter notebooks for exploration
-├── results/                # Results and outputs
+│   ├── evaluate.py         # Evaluation metrics
+│   ├── peft_trainer.py     # LoRA/QLoRA training
+│   ├── icl_inference.py    # ICL inference
+│   └── model_utils.py      # Model loading utilities
 ├── configs/                # Configuration files
+│   ├── lora_config.yaml    # LoRA hyperparameters
+│   ├── qlora_config.yaml   # QLoRA hyperparameters
+│   └── icl_config.yaml     # ICL prompt templates
+├── notebooks/              # Jupyter notebooks
+│   ├── data_exploration.ipynb
+│   ├── model_comparison.ipynb
+│   └── error_analysis.ipynb
+├── results/                # Results and outputs
+│   ├── lora/               # LoRA results
+│   ├── qlora/              # QLoRA results
+│   └── icl/                # ICL results
 ├── requirements.txt        # Python dependencies
-├── IMPLEMENTATION_PLAN.md  # Detailed implementation plan
-└── TECHNICAL_GUIDE.md      # Technical specifications
+├── environment.yml         # Conda environment
+└── README.md              # This file
 ```
 
 ## Setup Instructions
 
-### 1. Create Virtual Environment
+### 1. Create Conda Environment (Recommended)
+
+We provide a `environment.yml` file that includes all dependencies and Python version configuration:
+
+```bash
+conda env create -f environment.yml
+conda activate finqa-mini
+```
+
+### Alternative: Create Virtual Environment
+
+If you prefer using venv instead:
 
 ```bash
 python -m venv venv
@@ -62,23 +89,31 @@ mkdir -p src notebooks results configs
 
 ## Quick Start
 
-### Data Exploration
+### 1. Data Exploration
 
 ```bash
-jupyter notebook notebooks/data_exploration.ipynb
+python src/data_loader.py
 ```
 
-### Training Baseline Model
+### 2. LoRA Fine-tuning
 
 ```bash
-# Train retriever
-python models/retriever/train.py
-
-# Train generator
-python models/generator/train.py
+python src/peft_trainer.py --model llama-3-8b --method lora --config configs/lora_config.yaml
 ```
 
-### Evaluation
+### 3. QLoRA Fine-tuning
+
+```bash
+python src/peft_trainer.py --model mistral-7b --method qlora --config configs/qlora_config.yaml
+```
+
+### 4. ICL Inference
+
+```bash
+python src/icl_inference.py --model llama-3-8b --config configs/icl_config.yaml
+```
+
+### 5. Evaluation
 
 ```bash
 python src/evaluate.py --predictions results/predictions.json --gold data/test.json
@@ -86,12 +121,13 @@ python src/evaluate.py --predictions results/predictions.json --gold data/test.j
 
 ## Implementation Phases
 
-1. **Phase 1**: Environment setup and data preparation
-2. **Phase 2**: Baseline implementation (FinQANet architecture)
-3. **Phase 3**: Fine-tuned specialist model
-4. **Phase 4**: Large general-purpose ICL model
-5. **Phase 5**: Comparative analysis
-6. **Phase 6**: Documentation and reporting
+1. **Phase 1**: Environment setup and data preparation ✅
+2. **Phase 2**: Model selection and setup (2-4 open-source models)
+3. **Phase 3**: LoRA fine-tuning implementation
+4. **Phase 4**: QLoRA fine-tuning implementation
+5. **Phase 5**: ICL inference with few-shot prompting
+6. **Phase 6**: Comparative analysis and evaluation
+7. **Phase 7**: Documentation and reporting
 
 See `IMPLEMENTATION_PLAN.md` for detailed steps.
 

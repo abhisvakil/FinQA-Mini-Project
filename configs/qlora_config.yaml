@@ -1,0 +1,73 @@
+# QLoRA Configuration for FinQA Training
+
+# Quantization Configuration (4-bit)
+quantization:
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"  # Normal Float 4-bit
+  bnb_4bit_compute_dtype: "bfloat16"  # Compute in bfloat16
+  bnb_4bit_use_double_quant: true  # Nested quantization for more memory savings
+
+# LoRA Parameters (same as LoRA config)
+lora:
+  r: 8
+  lora_alpha: 16
+  target_modules:
+    - q_proj
+    - v_proj
+    # Optionally add more for better performance:
+    # - k_proj
+    # - o_proj
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# Training Hyperparameters
+training:
+  output_dir: "./results/qlora"
+  num_train_epochs: 3
+  per_device_train_batch_size: 4  # Can potentially increase due to memory savings
+  per_device_eval_batch_size: 4
+  gradient_accumulation_steps: 4
+  learning_rate: 2e-4
+  weight_decay: 0.01
+  warmup_steps: 100
+  lr_scheduler_type: "cosine"
+  
+  # Evaluation and Saving
+  evaluation_strategy: "steps"
+  eval_steps: 250
+  save_strategy: "steps"
+  save_steps: 500
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  
+  # Optimization (important for QLoRA)
+  fp16: false
+  bf16: true
+  optim: "paged_adamw_32bit"  # Special optimizer for QLoRA
+  max_grad_norm: 0.3  # Gradient clipping for stability
+  
+  # Logging
+  logging_steps: 50
+  logging_dir: "./logs/qlora"
+  report_to: "tensorboard"
+  
+  # Misc
+  max_seq_length: 2048
+  seed: 42
+  dataloader_num_workers: 4
+  gradient_checkpointing: true  # Save memory
+
+# Data Configuration
+data:
+  train_file: "data/train.json"
+  dev_file: "data/dev.json"
+  test_file: "data/test.json"
+  max_samples: null
+
+# Model Configuration
+model:
+  model_name_or_path: "meta-llama/Meta-Llama-3-8B-Instruct"  # Or use mistralai/Mistral-7B-Instruct-v0.2
+  torch_dtype: "bfloat16"
+  device_map: "auto"

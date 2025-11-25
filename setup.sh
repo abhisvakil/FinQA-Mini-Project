@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# Setup script for FinQA Mini Project
+# Setup script for FinQA Mini Project - PEFT vs ICL
 
-echo "Setting up FinQA Mini Project..."
+echo "Setting up FinQA Mini Project (PEFT vs ICL)..."
 
 # Create necessary directories
 echo "Creating project directories..."
 mkdir -p data
-mkdir -p models/retriever models/generator models/specialist models/icl
-mkdir -p src notebooks results configs
+mkdir -p results/lora results/qlora results/icl
+mkdir -p src notebooks configs logs
 
 # Check if virtual environment exists
 if [ ! -d "venv" ]; then
