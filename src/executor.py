@@ -64,6 +64,8 @@ class ProgramExecutor:
         program_str = program_str.replace('subtract(', 'self._subtract(')
         program_str = program_str.replace('multiply(', 'self._multiply(')
         program_str = program_str.replace('divide(', 'self._divide(')
+        program_str = program_str.replace('greater(', 'self._greater(')
+        program_str = program_str.replace('exp(', 'self._exp(')
         program_str = program_str.replace('max(', 'self._max(')
         program_str = program_str.replace('min(', 'self._min(')
         program_str = program_str.replace('table(', 'self._table(')
@@ -120,6 +122,14 @@ class ProgramExecutor:
     def _min(self, a: Union[str, float], b: Union[str, float]) -> float:
         """Return minimum of two values."""
         return min(self._to_float(a), self._to_float(b))
+    
+    def _greater(self, a: Union[str, float], b: Union[str, float]) -> float:
+        """Return the greater of two values."""
+        return max(self._to_float(a), self._to_float(b))
+    
+    def _exp(self, a: Union[str, float], b: Union[str, float]) -> float:
+        """Calculate a raised to the power of b."""
+        return self._to_float(a) ** self._to_float(b)
     
     def _table(self, row: Union[str, int], col: Union[str, int]) -> float:
         """

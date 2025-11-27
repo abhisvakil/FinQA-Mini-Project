@@ -1,105 +1,209 @@
-# Explainable Quantitative Reasoning for Financial Reports using FinQA
+# FinQA PEFT vs ICL Comparison
 
-## Project Overview
+Comparing **Parameter-Efficient Fine-Tuning** (LoRA/QLoRA) vs **In-Context Learning** for financial reasoning on the FinQA dataset.
 
-This project implements a system for automated analysis of complex financial reports, answering numerical questions by generating executable, step-by-step reasoning programs. We compare **Parameter-Efficient Fine-Tuning (PEFT)** methods (LoRA/QLoRA) against **In-Context Learning (ICL)** across 2-4 open-source language models.
+## 🎯 Project Goal
 
-### Approach
-- **PEFT Methods**: LoRA (Low-Rank Adaptation) and QLoRA (Quantized LoRA) for efficient fine-tuning
-  - Models: **Llama-3-8B** and **Mistral-7B** (optimal size for fine-tuning)
-- **ICL**: Few-shot prompting without fine-tuning
-  - Models: **Llama-3-70B** and **Qwen-2.5-72B** (larger models for better reasoning)
-- **Evaluation**: Compare accuracy, efficiency, and reasoning quality across methods
+Compare fine-tuning methods (LoRA, QLoRA) against few-shot prompting (ICL) for generating executable reasoning programs that answer numerical questions about financial reports.
 
-## Project Structure
+**Models**: Llama-3-8B-Instruct, Mistral-7B-Instruct-v0.2 (same models for all methods)  
+**Dataset**: FinQA (6,251 train / 883 dev / 1,147 test examples)  
+**Operations**: 6 mathematical functions (add, subtract, multiply, divide, greater, exp)
 
-```
-FinQA-Mini-Project/
-├── data/                    # Dataset files
-│   ├── train.json          # Training data
-│   ├── dev.json            # Development/validation data
-│   └── test.json           # Test data
-├── src/                    # Core source code
-│   ├── data_loader.py      # Data loading utilities
-│   ├── executor.py         # Program executor
-│   ├── evaluate.py         # Evaluation metrics
-│   ├── peft_trainer.py     # LoRA/QLoRA training
-│   ├── icl_inference.py    # ICL inference
-│   └── model_utils.py      # Model loading utilities
-├── configs/                # Configuration files
-│   ├── lora_config.yaml    # LoRA hyperparameters
-│   ├── qlora_config.yaml   # QLoRA hyperparameters
-│   └── icl_config.yaml     # ICL prompt templates
-├── notebooks/              # Jupyter notebooks
-│   ├── data_exploration.ipynb
-│   ├── model_comparison.ipynb
-│   └── error_analysis.ipynb
-├── results/                # Results and outputs
-│   ├── lora/               # LoRA results
-│   ├── qlora/              # QLoRA results
-│   └── icl/                # ICL results
-├── requirements.txt        # Python dependencies
-├── environment.yml         # Conda environment
-└── README.md              # This file
-```
+---
 
-## Setup Instructions
+## 🚀 Quick Start
 
-### 1. Create Conda Environment (Recommended)
-
-We provide a `environment.yml` file that includes all dependencies and Python version configuration:
+### 1. Setup Environment
 
 ```bash
+# Create conda environment
 conda env create -f environment.yml
 conda activate finqa-mini
-```
 
-### Alternative: Create Virtual Environment
-
-If you prefer using venv instead:
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 2. Install Dependencies
-
-```bash
+# Or use pip
 pip install -r requirements.txt
 ```
 
-### 3. Download FinQA Dataset
+### 2. Prepare Data
 
 ```bash
-# Clone the FinQA repository
-git clone https://github.com/czyssrs/FinQA.git
-cd FinQA
-
-# The dataset is in the dataset/ folder
-# Copy train.json, dev.json, test.json to this project's data/ folder
+# Load and simplify FinQA dataset
+cd src
+python data_loader_simplified.py
+cd ..
 ```
 
-### 4. Set Up Project Directories
+This creates simplified datasets in `data/simplified/` with only essential fields.
+
+### 3. Run Experiments
 
 ```bash
-mkdir -p data models/retriever models/generator models/specialist models/icl
-mkdir -p src notebooks results configs
+# Make script executable
+chmod +x run_all_experiments.sh
+
+# Option A: Run everything (12-17 hours on g5.2xlarge)
+./run_all_experiments.sh full
+
+# Option B: Train first, infer later
+./run_all_experiments.sh train-all    # 10-14 hours
+./run_all_experiments.sh infer-all    # 2-3 hours
+
+# Option C: Individual experiments
+./run_all_experiments.sh train-lora-llama
+./run_all_experiments.sh infer-lora-llama
+./run_all_experiments.sh infer-icl-llama
 ```
 
-## Quick Start
-
-### 1. Data Exploration
+### 4. Evaluate Results
 
 ```bash
-python src/data_loader.py
+cd src
+python evaluate.py --predictions_file ../results/predictions/Meta-Llama-3-8B-Instruct_lora_predictions.json
+# Repeat for all 6 prediction files
 ```
 
-### 2. LoRA Fine-tuning
+---
 
-```bash
-python src/peft_trainer.py --model llama-3-8b --method lora --config configs/lora_config.yaml
+## 📁 Project Structure
+
 ```
+FinQA-Mini-Project/
+├── data/
+│   └── simplified/              # Processed datasets
+│       ├── train_simplified.json
+│       ├── dev_simplified.json
+│       └── test_simplified.json
+│
+├── src/
+│   ├── data_loader_simplified.py   # Data processing
+│   ├── train_lora.py               # LoRA training
+│   ├── train_qlora.py              # QLoRA training
+│   ├── inference.py                # Unified inference (LoRA/QLoRA)
+│   ├── icl_inference.py            # ICL inference
+│   ├── evaluate.py                 # Evaluation metrics
+│   └── executor.py                 # Program execution
+│
+├── configs/
+│   ├── lora_config.yaml            # LoRA hyperparameters
+│   ├── qlora_config.yaml           # QLoRA hyperparameters
+│   └── icl_config.yaml             # ICL prompt templates
+│
+├── results/
+│   ├── lora/                       # LoRA adapters (~50MB each)
+│   ├── qlora/                      # QLoRA adapters (~50MB each)
+│   └── predictions/                # Inference outputs (6 JSON files)
+│
+├── run_all_experiments.sh          # Main experiment runner
+├── environment.yml                 # Conda environment
+├── requirements.txt                # Python dependencies
+├── README.md                       # This file
+└── PROJECT_GUIDE.md                # Detailed guide
+```
+
+---
+
+## 🧪 Experiment Overview
+
+| Method | Training Time | Adapter Size | Inference Time | Memory |
+|--------|--------------|--------------|----------------|--------|
+| **LoRA** | 2.5-3 hrs | ~50 MB | 20-30 min | ~20 GB |
+| **QLoRA** | 2.5-3.5 hrs | ~50 MB | 20-30 min | ~16 GB |
+| **ICL** | None | None | 20-30 min | ~20 GB |
+
+*Times per model on AWS g5.2xlarge (NVIDIA A10G 24GB)*
+
+**Total configurations**: 6 (2 models × 3 methods)
+
+---
+
+## 💡 Key Features
+
+- ✅ **Unified data format** - Simplified FinQA loader extracting only essential fields
+- ✅ **Consistent predictions** - All methods output same JSON format for easy comparison
+- ✅ **Efficient training** - LoRA adapters are 1000x smaller than full models
+- ✅ **Memory efficient** - QLoRA trains with 4-bit quantization
+- ✅ **Fair comparison** - Same base models used across all methods
+- ✅ **Easy execution** - Single script runs all experiments
+
+---
+
+## 📊 Expected Results
+
+After running experiments, you'll have:
+
+**Predictions**: 6 JSON files in `results/predictions/`
+- `Meta-Llama-3-8B-Instruct_lora_predictions.json`
+- `Meta-Llama-3-8B-Instruct_qlora_predictions.json`
+- `Meta-Llama-3-8B-Instruct_predictions.json` (ICL)
+- `Mistral-7B-Instruct-v0.2_lora_predictions.json`
+- `Mistral-7B-Instruct-v0.2_qlora_predictions.json`
+- `Mistral-7B-Instruct-v0.2_predictions.json` (ICL)
+
+**Evaluation Metrics**:
+- Execution Accuracy (correct numerical answer)
+- Program Accuracy (correct reasoning program)
+
+---
+
+## 🔧 Requirements
+
+- Python 3.10+
+- PyTorch 2.0+
+- Transformers 4.36+
+- PEFT 0.7+
+- BitsAndBytes 0.41+
+- GPU: 24GB VRAM recommended (NVIDIA A10G or better)
+
+---
+
+## 📚 Additional Documentation
+
+See **PROJECT_GUIDE.md** for:
+- Detailed workflow explanation
+- Command reference
+- Troubleshooting tips
+- AWS setup guide
+- Cost estimates
+
+---
+
+## 🏗️ Implementation Details
+
+**LoRA Configuration**:
+- Rank: 8
+- Alpha: 16
+- Target modules: q_proj, v_proj, k_proj, o_proj
+- Dropout: 0.05
+
+**QLoRA Configuration**:
+- 4-bit quantization (NF4)
+- Double quantization enabled
+- Compute dtype: bfloat16
+
+**ICL Configuration**:
+- 5-shot examples (diverse selection)
+- Temperature: 0.1
+- Max tokens: 256
+
+---
+
+## 📝 Citation
+
+```bibtex
+@inproceedings{chen2021finqa,
+  title={FinQA: A Dataset of Numerical Reasoning over Financial Data},
+  author={Chen, Zhiyu and Chen, Wenhu and Smiley, Charese and Shah, Sameena and Borova, Iana and Langdon, Dylan and Moussa, Reema and Beane, Matt and Huang, Ting-Hao and Routledge, Bryan and Wang, William Yang},
+  booktitle={EMNLP},
+  year={2021}
+}
+```
+
+---
+
+## 📞 Support
+
+For detailed instructions and troubleshooting, see **PROJECT_GUIDE.md**
 
 ### 3. QLoRA Fine-tuning
 
