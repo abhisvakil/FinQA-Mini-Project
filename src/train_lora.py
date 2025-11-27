@@ -277,7 +277,7 @@ def main():
         bf16=True,
         report_to="tensorboard",
         logging_dir=os.path.join(output_dir, "logs"),
-        gradient_checkpointing=True,
+        gradient_checkpointing=False,  # Disabled - conflicts with LoRA
         optim="adamw_torch"
     )
     
