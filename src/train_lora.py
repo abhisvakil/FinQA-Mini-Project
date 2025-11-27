@@ -227,6 +227,9 @@ def main():
     else:
         target_modules = ["q_proj", "v_proj"]
     
+    # Enable gradient checkpointing
+    model.gradient_checkpointing_enable()
+    
     lora_config = LoraConfig(
         r=args.lora_r,
         lora_alpha=args.lora_alpha,
