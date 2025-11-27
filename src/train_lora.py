@@ -268,7 +268,7 @@ def main():
         eval_steps=250,
         save_steps=500,
         save_total_limit=3,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         load_best_model_at_end=True,
         bf16=True,

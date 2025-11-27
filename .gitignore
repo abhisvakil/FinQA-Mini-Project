@@ -51,3 +51,4 @@ FinQA/
 *.key
 config.ini
 
+*.pem
