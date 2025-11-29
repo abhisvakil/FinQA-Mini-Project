@@ -276,8 +276,7 @@ def main():
         args.model_name,
         torch_dtype=torch.bfloat16,
         device_map="auto",
-        #load_in_8bit=args.load_in_8bit,
-        load_in_4bit=True,
+        load_in_8bit=args.load_in_8bit,
         trust_remote_code=True
     )
     model.eval()
