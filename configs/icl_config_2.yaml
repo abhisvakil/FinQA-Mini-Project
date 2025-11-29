@@ -1,0 +1,78 @@
+# In-Context Learning Configuration for FinQA -- Mistral Chatty Config
+
+model:
+  model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"  # Or path to your Mistral checkpoint
+  torch_dtype: "bfloat16"
+  device_map: "auto"
+  load_in_8bit: false
+
+generation:
+  max_new_tokens: 256
+  temperature: 0.1
+  top_p: 0.95
+  top_k: 50
+  do_sample: true
+  num_beams: 1
+  repetition_penalty: 1.1
+
+icl:
+  num_shots: 5
+  example_selection: "diverse"
+
+# SYSTEM PROMPT for a chatty, concise, conversational model
+system_prompt: |
+  You are a highly capable assistant specializing in financial report analysis.
+  Your job is to help answer computational questions about tables, reasoning step-by-step and explaining your logic as a program.
+  Use ONLY the following functions in your solution:
+    add, subtract, multiply, divide, exp, greater.
+  Output your answer as a program, ensuring it is as concise as possible but contains all logic needed for correctness.
+  If the logic is trivial, do not over-explain. Focus on accuracy and clarity.
+
+# Prompt template is slightly less formal, and includes encouragement to be helpful and clear:
+prompt_template: |
+  {system_prompt}
+
+  Examples for you to follow:
+
+  {few_shot_examples}
+
+  Please now solve this:
+
+  Question: {question}
+  Context:
+  {context}
+
+  Program:
+
+# Examples will be programmatically filled, but here is placeholder structure:
+few_shot_examples:
+  - question: "What was the net profit for Q4 and Q2?"
+    context: |
+      Table:
+      | Quarter | Profit |
+      | Q2      | 400    |
+      | Q4      | 700    |
+    program: "add(const(400), const(700))"
+  - question: "What is the gross margin percentage in 2021?"
+    context: |
+      Table:
+      | Year | Revenue | COGS |
+      | 2021 | 900     | 600  |
+    program: "multiply(divide(subtract(const(900), const(600)), const(900)), const(100))"
+  - question: "Show the difference in earnings between 2020 and 2021."
+    context: |
+      Table:
+      | Year | Earnings |
+      | 2020 | 300      |
+      | 2021 | 450      |
+    program: "subtract(const(450), const(300))"
+
+data:
+  test_file: "data/test.json"
+  output_file: "results/icl_config_2/predictions.json"
+  max_samples: null
+
+inference:
+  batch_size: 1
+  use_cache: true
+  save_intermediate: true

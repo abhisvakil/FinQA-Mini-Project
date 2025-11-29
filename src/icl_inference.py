@@ -276,7 +276,8 @@ def main():
         args.model_name,
         torch_dtype=torch.bfloat16,
         device_map="auto",
-        load_in_8bit=args.load_in_8bit,
+        #load_in_8bit=args.load_in_8bit,
+        load_in_4bit=True,
         trust_remote_code=True
     )
     model.eval()
@@ -319,7 +320,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     
     model_name_short = args.model_name.split("/")[-1]
-    output_path = os.path.join(args.output_dir, f"{model_name_short}_predictions.json")
+    output_path = os.path.join(args.output_dir, f"{model_name_short}_ICL_predictions.json")
     
     with open(output_path, 'w') as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
