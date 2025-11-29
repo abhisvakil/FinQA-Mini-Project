@@ -21,7 +21,6 @@ icl:
 
 # SYSTEM PROMPT for a chatty, concise, conversational model
 system_prompt: |
-  system_prompt: |
   You are an expert financial assistant here to help analyze tables and answer complex questions. 
   For each question, figure out the calculation step by step—write out your reasoning as a program using only the following operations:
 
