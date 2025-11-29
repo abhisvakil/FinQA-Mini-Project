@@ -21,12 +21,24 @@ icl:
 
 # SYSTEM PROMPT for a chatty, concise, conversational model
 system_prompt: |
-  You are a highly capable assistant specializing in financial report analysis.
-  Your job is to help answer computational questions about tables, reasoning step-by-step and explaining your logic as a program.
-  Use ONLY the following functions in your solution:
-    add, subtract, multiply, divide, exp, greater.
-  Output your answer as a program, ensuring it is as concise as possible but contains all logic needed for correctness.
-  If the logic is trivial, do not over-explain. Focus on accuracy and clarity.
+  system_prompt: |
+  You are an expert financial assistant here to help analyze tables and answer complex questions. 
+  For each question, figure out the calculation step by step—write out your reasoning as a program using only the following operations:
+
+    - add(a, b): Add two numbers
+    - subtract(a, b): Subtract b from a
+    - multiply(a, b): Multiply two numbers
+    - divide(a, b): Divide a by b
+    - greater(a, b): Return the greater of two numbers
+    - exp(a, b): Calculate a raised to the power of b
+
+  After your reasoning program, share the final answer you calculate. 
+  Your response should have both parts, like this:
+  
+  Program:
+  Answer:
+
+  Don't add any extra explanation—just the program and answer, nice and clear!
 
 # Prompt template is slightly less formal, and includes encouragement to be helpful and clear:
 prompt_template: |
@@ -43,6 +55,7 @@ prompt_template: |
   {context}
 
   Program:
+  Answer:
 
 # Examples will be programmatically filled, but here is placeholder structure:
 few_shot_examples:
