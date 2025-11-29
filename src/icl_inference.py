@@ -81,6 +81,12 @@ def format_few_shot_examples(examples: List[Dict], system_prompt: str) -> str:
         prompt_parts.append(f"\nExample {i}:")
         prompt_parts.append(f"Question: {ex['question']}")
         
+        # Add text context if present
+        if ex.get('pre_text'):
+            prompt_parts.append("\nText:")
+            for sent in ex['pre_text'][:10]:  # Limit length
+                prompt_parts.append(sent)
+        
         # Add table if present
         if ex.get('table'):
             prompt_parts.append("\nTable:")
