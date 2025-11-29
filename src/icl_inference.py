@@ -10,6 +10,8 @@ import yaml
 import torch
 import random
 import argparse
+import shutil
+from datetime import datetime
 from typing import List, Dict
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from tqdm import tqdm
@@ -315,18 +317,43 @@ def main():
     print("\n[4/5] Running inference...")
     predictions = run_inference(model, tokenizer, test_data, few_shot_prompt, config)
     
-    # Save predictions
-    print("\n[5/5] Saving predictions...")
-    os.makedirs(args.output_dir, exist_ok=True)
+    # Save predictions and config in organized folder
+    print("\n[5/5] Saving predictions and config...")
     
     model_name_short = model_name.split("/")[-1]
-    output_filename = f"{model_name_short}_icl_predictions.json"
-    output_path = os.path.join(args.output_dir, output_filename)
+    num_shots = config['icl']['num_shots']
+    selection_method = config['icl'].get('example_selection', 'diverse')
     
-    with open(output_path, 'w') as f:
+    # Create organized output directory: results/icl/{model_name}/{num_shots}shot_{selection_method}
+    icl_base_dir = os.path.join(args.output_dir, "icl", model_name_short)
+    run_dir = os.path.join(icl_base_dir, f"{num_shots}shot_{selection_method}")
+    os.makedirs(run_dir, exist_ok=True)
+    
+    # Save predictions
+    predictions_path = os.path.join(run_dir, "predictions.json")
+    with open(predictions_path, 'w') as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
+    print(f"  Predictions saved to: {predictions_path}")
     
-    print(f"  Saved to: {output_path}")
+    # Copy config file to results folder
+    config_copy_path = os.path.join(run_dir, "config.yaml")
+    shutil.copy2(args.config, config_copy_path)
+    print(f"  Config saved to: {config_copy_path}")
+    
+    # Save metadata
+    metadata = {
+        "model": model_name,
+        "num_shots": num_shots,
+        "selection_method": selection_method,
+        "temperature": config['generation']['temperature'],
+        "num_predictions": len(predictions),
+        "timestamp": datetime.now().isoformat(),
+        "config_file": args.config
+    }
+    metadata_path = os.path.join(run_dir, "metadata.json")
+    with open(metadata_path, 'w') as f:
+        json.dump(metadata, f, indent=2)
+    print(f"  Metadata saved to: {metadata_path}")
     
     # Quick preview
     print("\n" + "=" * 80)
@@ -340,7 +367,11 @@ def main():
     print(f"  Gold program: {predictions[0]['gold_program'][:100]}...")
     print(f"  Gold answer: {predictions[0]['gold_answer']}")
     print("=" * 80)
-    print(f"\n✓ ICL inference complete! Results saved to {output_path}")
+    print(f"\n✓ ICL inference complete!")
+    print(f"  Results directory: {run_dir}")
+    print(f"  - predictions.json")
+    print(f"  - config.yaml")
+    print(f"  - metadata.json")
 
 
 if __name__ == "__main__":
