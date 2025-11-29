@@ -175,11 +175,10 @@ function infer_icl_llama() {
     echo -e "${YELLOW}[INFER] ICL Llama...${NC}"
     cd src
     python icl_inference.py \
+        --config ../configs/icl_config.yaml \
         --model_name "$LLAMA_MODEL" \
         --data_dir "../$DATA_DIR" \
-        --output_dir "../$PRED_DIR" \
-        --num_shots 5 \
-        --temperature 0.1
+        --output_dir "../$PRED_DIR"
     cd ..
     echo -e "${YELLOW}✓ ICL Llama inference complete${NC}\n"
 }
@@ -188,11 +187,10 @@ function infer_icl_mistral() {
     echo -e "${YELLOW}[INFER] ICL Mistral...${NC}"
     cd src
     python icl_inference.py \
+        --config ../configs/icl_config.yaml \
         --model_name "$MISTRAL_MODEL" \
         --data_dir "../$DATA_DIR" \
-        --output_dir "../$PRED_DIR" \
-        --num_shots 5 \
-        --temperature 0.1
+        --output_dir "../$PRED_DIR"
     cd ..
     echo -e "${YELLOW}✓ ICL Mistral inference complete${NC}\n"
 }

@@ -213,9 +213,28 @@ python src/peft_trainer.py --model mistral-7b --method qlora --config configs/ql
 
 ### 4. ICL Inference
 
-```bash
-python src/icl_inference.py --model llama-3-8b --config configs/icl_config.yaml
-```
+
+To run In-Context Learning (ICL) inference with your chosen model and prompt style:
+
+# Run ICL with the default config (e.g., for Llama-3-8B-Instruct with formal prompt)
+python src/icl_inference_new.py --config configs/icl_config_1.yaml
+
+# Run ICL with a different prompt or model (e.g., Mistral-7B-Instruct-v0.2 with chatty prompt)
+python src/icl_inference_new.py --config configs/icl_config_2.yaml- **Config file structure:** All ICL settings—model, prompt engineering, output path, sampling hyperparameters—are controlled via a YAML config.
+- **Few-shot examples** are dynamically sampled at runtime from your training data based on config (`num_shots`, etc.).
+- The output is saved to the location specified in your config (`output_file`).
+
+**Example config files:**
+- `configs/icl_config_1.yaml`  (formal, rule-based prompt for Llama-3)
+- `configs/icl_config_2.yaml`  (chatty, assistant-style prompt for Mistral-7B)
+
+For more details on prompt ablation, see the `configs/` directory and comments in `src/icl_inference.py`.
+
+---
+
+**Sample command – Llama:**
+python src/icl_inference_new.py --config configs/icl_config_1.yaml**Sample command – Mistral:**
+python src/icl_inference_new.py --config configs/icl_config_2.yaml
 
 ### 5. Evaluation
 

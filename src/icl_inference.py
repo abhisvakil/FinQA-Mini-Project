@@ -1,101 +1,27 @@
 """
-In-Context Learning (ICL) inference script for FinQA.
-Uses few-shot prompting with Llama-3-8B or Mistral-7B without fine-tuning.
+Unified In-Context Learning (ICL) inference script for FinQA.
+Uses YAML config and produces predictions in the same format as LoRA inference.
 """
 
 import os
 import sys
 import json
+import yaml
 import torch
+import random
 import argparse
-from typing import List, Dict, Optional
+from typing import List, Dict
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from tqdm import tqdm
-import random
 
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from data_loader_simplified import FinQASimplifiedLoader
 
 
-def create_few_shot_prompt(question: str, pre_text: List[str], post_text: List[str], 
-                           table: List[List[str]], examples: List[Dict]) -> str:
-    """
-    Create a few-shot prompt with examples.
-    
-    Args:
-        question: The question to answer
-        pre_text: Context before table
-        post_text: Context after table  
-        table: Financial table
-        examples: Few-shot examples
-        
-    Returns:
-        Formatted prompt string
-    """
-    system_prompt = """You are a financial analyst. Answer numerical questions about financial reports by generating executable reasoning programs.
-
-Available Operations:
-- add(a, b): Add two numbers
-- subtract(a, b): Subtract b from a  
-- multiply(a, b): Multiply two numbers
-- divide(a, b): Divide a by b
-- greater(a, b): Return the greater of two numbers
-- exp(a, b): Calculate a raised to the power of b
-
-Here are some examples:
-
-"""
-    
-    # Add few-shot examples
-    example_texts = []
-    for i, ex in enumerate(examples, 1):
-        ex_text = f"Example {i}:\n"
-        ex_text += f"Question: {ex['question']}\n"
-        
-        # Add table from example
-        if ex['table']:
-            ex_text += "Table:\n"
-            table_data = ex['table']
-            if len(table_data) > 0:
-                header = " | ".join(table_data[0])
-                ex_text += f"| {header} |\n"
-                for row in table_data[1:min(4, len(table_data))]:  # Limit rows
-                    row_str = " | ".join(str(cell) for cell in row)
-                    ex_text += f"| {row_str} |\n"
-        
-        # Add program and answer
-        program_str = " ".join(ex['program']) if ex['program'] else ""
-        ex_text += f"\nProgram: {program_str}\n"
-        ex_text += f"Answer: {ex['answer']}\n"
-        
-        example_texts.append(ex_text)
-    
-    few_shot_examples = "\n".join(example_texts)
-    
-    # Add current question
-    current_question = "\nNow answer this question:\n\n"
-    current_question += f"Question: {question}\n"
-    
-    # Add context
-    if pre_text:
-        current_question += "Text Context:\n"
-        for sent in pre_text[:5]:  # Limit sentences
-            current_question += f"{sent}\n"
-    
-    # Add table
-    if table:
-        current_question += "\nTable:\n"
-        if len(table) > 0:
-            header = " | ".join(table[0])
-            current_question += f"| {header} |\n"
-            for row in table[1:]:
-                row_str = " | ".join(str(cell) for cell in row)
-                current_question += f"| {row_str} |\n"
-    
-    current_question += "\nProgram:"
-    
-    return system_prompt + few_shot_examples + current_question
+def load_config(config_path: str) -> dict:
+    """Load YAML configuration file."""
+    with open(config_path, 'r') as f:
+        return yaml.safe_load(f)
 
 
 def select_few_shot_examples(train_data: List[Dict], num_examples: int = 5, 
@@ -115,21 +41,13 @@ def select_few_shot_examples(train_data: List[Dict], num_examples: int = 5,
         return random.sample(train_data, min(num_examples, len(train_data)))
     
     elif selection_method == "diverse":
-        # Select diverse examples based on program length and table size
+        # Select diverse examples based on program length
         examples = []
-        
-        # Sort by program length
         sorted_by_program = sorted(train_data, key=lambda x: len(x.get('program', [])))
         
-        # Select from different quartiles
         n = len(sorted_by_program)
-        indices = [
-            n // 4,           # Short program
-            n // 2,           # Medium program
-            3 * n // 4,       # Long program
-        ]
+        indices = [n // 4, n // 2, 3 * n // 4]
         
-        # Add some random ones
         for idx in indices:
             if idx < len(sorted_by_program):
                 examples.append(sorted_by_program[idx])
@@ -144,9 +62,83 @@ def select_few_shot_examples(train_data: List[Dict], num_examples: int = 5,
     return train_data[:num_examples]
 
 
-def parse_model_output(output: str) -> tuple[str, str]:
+def format_few_shot_examples(examples: List[Dict], system_prompt: str) -> str:
+    """
+    Format few-shot examples into a prompt.
+    
+    Args:
+        examples: List of example dictionaries
+        system_prompt: System instructions
+        
+    Returns:
+        Formatted few-shot prompt
+    """
+    prompt_parts = [system_prompt, "\nHere are some examples:\n"]
+    
+    for i, ex in enumerate(examples, 1):
+        prompt_parts.append(f"\nExample {i}:")
+        prompt_parts.append(f"Question: {ex['question']}")
+        
+        # Add table if present
+        if ex.get('table'):
+            prompt_parts.append("\nTable:")
+            table = ex['table']
+            if len(table) > 0:
+                header = " | ".join(table[0])
+                prompt_parts.append(f"| {header} |")
+                for row in table[1:min(4, len(table))]:  # Limit rows
+                    row_str = " | ".join(str(cell) for cell in row)
+                    prompt_parts.append(f"| {row_str} |")
+        
+        # Add program
+        program_str = " ".join(ex['program']) if isinstance(ex['program'], list) else ex['program']
+        prompt_parts.append(f"\nProgram: {program_str}\n")
+    
+    return "\n".join(prompt_parts)
+
+
+def create_icl_prompt(example: Dict, few_shot_prompt: str) -> str:
+    """
+    Create full ICL prompt with few-shot examples and current question.
+    
+    Args:
+        example: Test example
+        few_shot_prompt: Pre-formatted few-shot examples
+        
+    Returns:
+        Complete prompt
+    """
+    prompt_parts = [few_shot_prompt, "\nNow answer this question:\n"]
+    
+    # Add current question
+    prompt_parts.append(f"Question: {example['question']}")
+    
+    # Add context
+    if example.get('pre_text'):
+        prompt_parts.append("\nText:")
+        for sent in example['pre_text'][:10]:  # Limit length
+            prompt_parts.append(sent)
+    
+    # Add table
+    if example.get('table'):
+        prompt_parts.append("\nTable:")
+        table = example['table']
+        if len(table) > 0:
+            header = " | ".join(table[0])
+            prompt_parts.append(f"| {header} |")
+            for row in table[1:]:
+                row_str = " | ".join(str(cell) for cell in row)
+                prompt_parts.append(f"| {row_str} |")
+    
+    prompt_parts.append("\nProgram:")
+    
+    return "\n".join(prompt_parts)
+
+
+def parse_model_output(output: str) -> tuple:
     """
     Parse model output to extract program and answer.
+    Same format as LoRA inference.
     
     Args:
         output: Raw model output
@@ -157,50 +149,49 @@ def parse_model_output(output: str) -> tuple[str, str]:
     program = ""
     answer = ""
     
-    # Try to extract program
-    if "Program:" in output:
-        program_part = output.split("Program:")[1]
-        if "Answer:" in program_part:
-            program = program_part.split("Answer:")[0].strip()
-            answer = program_part.split("Answer:")[1].strip()
-        else:
-            program = program_part.strip()
-    else:
-        # If no "Program:" marker, try to extract from beginning
-        lines = output.strip().split('\n')
-        if lines:
-            program = lines[0].strip()
+    lines = output.strip().split('\n')
+    
+    for line in lines:
+        if line.strip().startswith("Program:"):
+            program = line.replace("Program:", "").strip()
+        elif line.strip().startswith("Answer:"):
+            answer = line.replace("Answer:", "").strip()
+    
+    # If no markers, assume first line is program
+    if not program and lines:
+        program = lines[0].strip()
+    
+    # Try to extract answer if not found
+    if not answer and len(lines) > 1:
+        for line in lines[1:]:
+            if line.strip() and not line.startswith("Program"):
+                answer = line.strip()
+                break
     
     return program, answer
 
 
-def run_inference(model, tokenizer, test_data: List[Dict], few_shot_examples: List[Dict],
-                 max_new_tokens: int = 256, temperature: float = 0.1) -> List[Dict]:
+def run_inference(model, tokenizer, test_data: List[Dict], few_shot_prompt: str,
+                 config: dict) -> List[Dict]:
     """
     Run ICL inference on test data.
     
     Args:
-        model: The language model
-        tokenizer: The tokenizer
+        model: Language model
+        tokenizer: Tokenizer
         test_data: Test examples
-        few_shot_examples: Few-shot examples to use
-        max_new_tokens: Maximum tokens to generate
-        temperature: Sampling temperature
+        few_shot_prompt: Pre-formatted few-shot examples
+        config: Configuration dictionary
         
     Returns:
-        List of predictions
+        List of predictions in same format as LoRA inference
     """
+    gen_config = config['generation']
     predictions = []
     
-    for example in tqdm(test_data, desc="Running inference"):
+    for example in tqdm(test_data, desc="Running ICL inference"):
         # Create prompt
-        prompt = create_few_shot_prompt(
-            example['question'],
-            example['pre_text'],
-            example['post_text'],
-            example['table'],
-            few_shot_examples
-        )
+        prompt = create_icl_prompt(example, few_shot_prompt)
         
         # Tokenize
         inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048)
@@ -210,27 +201,31 @@ def run_inference(model, tokenizer, test_data: List[Dict], few_shot_examples: Li
         with torch.no_grad():
             outputs = model.generate(
                 **inputs,
-                max_new_tokens=max_new_tokens,
-                temperature=temperature,
-                do_sample=temperature > 0,
-                top_p=0.95,
-                pad_token_id=tokenizer.eos_token_id
+                max_new_tokens=gen_config['max_new_tokens'],
+                temperature=gen_config['temperature'],
+                do_sample=gen_config.get('do_sample', True),
+                top_p=gen_config.get('top_p', 0.95),
+                pad_token_id=tokenizer.eos_token_id,
+                eos_token_id=tokenizer.eos_token_id
             )
         
         # Decode
-        generated_text = tokenizer.decode(outputs[0][inputs['input_ids'].shape[1]:], skip_special_tokens=True)
+        generated_text = tokenizer.decode(
+            outputs[0][inputs['input_ids'].shape[1]:],
+            skip_special_tokens=True
+        )
         
         # Parse output
         program, answer = parse_model_output(generated_text)
         
-        # Store prediction
+        # Store prediction in same format as LoRA inference
         predictions.append({
             'id': example['id'],
             'question': example['question'],
             'predicted_program': program,
             'predicted_answer': answer,
-            'gold_program': ' '.join(example['program']),
-            'gold_answer': example['answer'],
+            'gold_program': ' '.join(example['program']) if isinstance(example['program'], list) else example['program'],
+            'gold_answer': str(example['answer']),
             'raw_output': generated_text
         })
     
@@ -238,49 +233,53 @@ def run_inference(model, tokenizer, test_data: List[Dict], few_shot_examples: Li
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ICL Inference for FinQA")
-    parser.add_argument("--model_name", type=str, default="meta-llama/Meta-Llama-3-8B-Instruct",
-                        help="Model name or path")
+    parser = argparse.ArgumentParser(description="Unified ICL Inference for FinQA")
+    parser.add_argument("--config", type=str, default="../configs/icl_config.yaml",
+                        help="Path to ICL config YAML file")
+    parser.add_argument("--model_name", type=str, default=None,
+                        help="Override model name from config")
     parser.add_argument("--data_dir", type=str, default="../data/simplified",
                         help="Data directory")
-    parser.add_argument("--output_dir", type=str, default="../results/icl",
-                        help="Output directory")
-    parser.add_argument("--num_shots", type=int, default=5,
-                        help="Number of few-shot examples")
+    parser.add_argument("--output_dir", type=str, default="../results/predictions",
+                        help="Output directory for predictions")
     parser.add_argument("--max_samples", type=int, default=None,
                         help="Max test samples (for quick testing)")
-    parser.add_argument("--temperature", type=float, default=0.1,
-                        help="Sampling temperature")
-    parser.add_argument("--max_new_tokens", type=int, default=256,
-                        help="Maximum tokens to generate")
-    parser.add_argument("--load_in_8bit", action="store_true",
-                        help="Load model in 8-bit for memory efficiency")
     
     args = parser.parse_args()
     
+    # Load config
     print("=" * 80)
-    print("ICL INFERENCE FOR FINQA")
+    print("UNIFIED ICL INFERENCE FOR FINQA")
     print("=" * 80)
-    print(f"Model: {args.model_name}")
-    print(f"Few-shot examples: {args.num_shots}")
-    print(f"Temperature: {args.temperature}")
+    print(f"Config: {args.config}")
+    
+    config = load_config(args.config)
+    
+    # Override model if specified
+    if args.model_name:
+        config['model']['model_name_or_path'] = args.model_name
+    
+    model_name = config['model']['model_name_or_path']
+    print(f"Model: {model_name}")
+    print(f"Few-shot examples: {config['icl']['num_shots']}")
+    print(f"Temperature: {config['generation']['temperature']}")
     print(f"Output: {args.output_dir}")
     print("=" * 80)
     
     # Load model and tokenizer
     print("\n[1/5] Loading model and tokenizer...")
-    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
     
     model = AutoModelForCausalLM.from_pretrained(
-        args.model_name,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",
-        load_in_8bit=args.load_in_8bit,
+        model_name,
+        torch_dtype=getattr(torch, config['model'].get('torch_dtype', 'bfloat16')),
+        device_map=config['model'].get('device_map', 'auto'),
+        load_in_8bit=config['model'].get('load_in_8bit', False),
         trust_remote_code=True
     )
     model.eval()
-    
     print(f"  Model loaded on device: {model.device}")
     
     # Load data
@@ -300,43 +299,48 @@ def main():
     print(f"  Test examples: {len(test_data)}")
     
     # Select few-shot examples
-    print(f"\n[3/5] Selecting {args.num_shots} few-shot examples...")
-    few_shot_examples = select_few_shot_examples(train_data, args.num_shots, "diverse")
+    print(f"\n[3/5] Selecting few-shot examples...")
+    num_shots = config['icl']['num_shots']
+    selection_method = config['icl'].get('example_selection', 'diverse')
+    few_shot_examples = select_few_shot_examples(train_data, num_shots, selection_method)
     
     for i, ex in enumerate(few_shot_examples, 1):
         print(f"  Example {i}: {ex['question'][:60]}...")
     
+    # Create few-shot prompt
+    system_prompt = config.get('system_prompt', '')
+    few_shot_prompt = format_few_shot_examples(few_shot_examples, system_prompt)
+    
     # Run inference
     print("\n[4/5] Running inference...")
-    predictions = run_inference(
-        model, tokenizer, test_data, few_shot_examples,
-        max_new_tokens=args.max_new_tokens,
-        temperature=args.temperature
-    )
+    predictions = run_inference(model, tokenizer, test_data, few_shot_prompt, config)
     
     # Save predictions
     print("\n[5/5] Saving predictions...")
     os.makedirs(args.output_dir, exist_ok=True)
     
-    model_name_short = args.model_name.split("/")[-1]
-    output_path = os.path.join(args.output_dir, f"{model_name_short}_predictions.json")
+    model_name_short = model_name.split("/")[-1]
+    output_filename = f"{model_name_short}_icl_predictions.json"
+    output_path = os.path.join(args.output_dir, output_filename)
     
     with open(output_path, 'w') as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
     
     print(f"  Saved to: {output_path}")
     
-    # Quick stats
+    # Quick preview
     print("\n" + "=" * 80)
-    print("QUICK STATISTICS")
+    print("PREVIEW OF PREDICTIONS")
     print("=" * 80)
     print(f"Total predictions: {len(predictions)}")
-    print(f"Sample prediction:")
+    print(f"\nFirst prediction:")
     print(f"  Question: {predictions[0]['question']}")
-    print(f"  Predicted: {predictions[0]['predicted_program'][:100]}...")
-    print(f"  Gold: {predictions[0]['gold_program'][:100]}...")
+    print(f"  Predicted program: {predictions[0]['predicted_program'][:100]}...")
+    print(f"  Predicted answer: {predictions[0]['predicted_answer']}")
+    print(f"  Gold program: {predictions[0]['gold_program'][:100]}...")
+    print(f"  Gold answer: {predictions[0]['gold_answer']}")
     print("=" * 80)
-    print(f"\n✓ Inference complete! Results saved to {output_path}")
+    print(f"\n✓ ICL inference complete! Results saved to {output_path}")
 
 
 if __name__ == "__main__":
