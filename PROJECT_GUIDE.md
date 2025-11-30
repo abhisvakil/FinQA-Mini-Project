@@ -1,578 +1,765 @@
-# FinQA PEFT vs ICL - Complete Project Guide
+# FinQA Project Guide - Complete Documentation
 
 ## Table of Contents
 1. [Overview](#overview)
 2. [Complete Workflow](#complete-workflow)
-3. [What Gets Saved](#what-gets-saved)
-4. [Command Reference](#command-reference)
-5. [AWS Setup Guide](#aws-setup-guide)
-6. [Implementation Details](#implementation-details)
-7. [Troubleshooting](#troubleshooting)
+3. [Detailed Setup](#detailed-setup)
+4. [Running Experiments](#running-experiments)
+5. [Results Organization](#results-organization)
+6. [Command Reference](#command-reference)
+7. [AWS Setup Guide](#aws-setup-guide)
+8. [Troubleshooting](#troubleshooting)
+9. [Implementation Details](#implementation-details)
 
 ---
 
 ## Overview
 
-This project compares three methods for financial reasoning:
-- **LoRA**: Fine-tuning with Low-Rank Adaptation (efficient adapters)
-- **QLoRA**: LoRA with 4-bit quantization (more memory efficient)
-- **ICL**: In-Context Learning with few-shot prompting (no training)
+This project compares two methods for financial reasoning on FinQA:
 
-**Goal**: Determine which method produces the best reasoning programs for numerical questions about financial reports.
+| Method | Description | Training Required | Key Advantage |
+|--------|-------------|-------------------|---------------|
+| **LoRA** | Low-Rank Adaptation fine-tuning | Yes (2.5-3 hrs) | Learns task-specific patterns |
+| **ICL** | In-Context Learning (few-shot) | No | Zero training cost |
 
-**Models**: Llama-3-8B-Instruct, Mistral-7B-Instruct-v0.2  
-**Dataset**: FinQA (6,251 train / 883 dev / 1,147 test)  
-**Total Experiments**: 6 (2 models × 3 methods)
+**Goal**: Determine which method produces better reasoning programs for numerical financial questions.
+
+**Models**: 
+- Llama-3-8B-Instruct (Meta)
+- Mistral-7B-Instruct-v0.2 (Mistral AI)
+
+**Dataset**: FinQA
+- Train: 6,251 examples
+- Dev: 883 examples
+- Test: 1,147 examples
+
+**Total Experiments**: 4 (2 models × 2 methods)
 
 ---
 
 ## Complete Workflow
 
 ```
-┌──────────────┐
-│   RAW DATA   │
-│  FinQA JSON  │
-└──────┬───────┘
-       │
-       │ data_loader_simplified.py
-       ▼
-┌──────────────────────┐
-│  SIMPLIFIED DATA     │
-│  Essential fields    │
-│  only                │
-└──────┬───────────────┘
-       │
-       ├────────────┬──────────────┬──────────────┐
-       │            │              │              │
-       ▼            ▼              ▼              │
-  ┌────────┐  ┌─────────┐   ┌─────────┐         │
-  │  LoRA  │  │ QLoRA   │   │   ICL   │         │
-  │Training│  │Training │   │ (Direct)│         │
-  │2.5-3hrs│  │2.5-3hrs │   │  No     │         │
-  │        │  │         │   │Training │         │
-  └───┬────┘  └────┬────┘   └────┬────┘         │
-      │            │             │              │
-      ▼            ▼             │              │
-  ┌────────┐  ┌─────────┐       │              │
-  │Adapters│  │Adapters │       │              │
-  │ ~50MB  │  │ ~50MB   │       │              │
-  └───┬────┘  └────┬────┘       │              │
-      │            │             │              │
-      ├────────────┴─────────────┴──────────────┘
-      │
-      ▼
-┌──────────────────────┐
-│    INFERENCE         │
-│ inference.py (LoRA)  │
-│ icl_inference.py     │
-│                      │
-│ Test set: 1,147      │
-└──────┬───────────────┘
-       │
-       ▼
-┌──────────────────────┐
-│   PREDICTIONS        │
-│  6 JSON files        │
-└──────┬───────────────┘
-       │
-       ▼
-┌──────────────────────┐
-│    EVALUATION        │
-│ Execution Accuracy   │
-│ Program Accuracy     │
-└──────────────────────┘
+┌─────────────────────────────────────────────────────────┐
+│                    RAW FinQA DATASET                    │
+│        (Loaded from HuggingFace datasets library)       │
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     │ data_loader_simplified.py
+                     │ (Extracts essential fields only)
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+│               SIMPLIFIED DATASET FILES                  │
+│   train_simplified.json / dev / test (in data/simplified/) │
+└────────────┬────────────────────┬───────────────────────┘
+             │                    │
+             │                    │
+    ┌────────▼────────┐    ┌──────▼──────┐
+    │  LoRA TRAINING  │    │  ICL DIRECT │
+    │   train_lora.py │    │  (No Train) │
+    │   2.5-3 hours   │    │             │
+    └────────┬────────┘    └──────┬──────┘
+             │                    │
+             ▼                    │
+    ┌─────────────────┐           │
+    │ LoRA ADAPTERS   │           │
+    │   ~50MB each    │           │
+    │ (results/lora/) │           │
+    └────────┬────────┘           │
+             │                    │
+             ├────────────────────┘
+             │
+             ▼
+    ┌─────────────────────────────────┐
+    │        INFERENCE PHASE          │
+    │  - inference.py (LoRA)          │
+    │  - icl_inference.py (ICL)       │
+    │  Test set: 1,147 examples       │
+    │  Time: 20-30 min per model      │
+    └────────┬────────────────────────┘
+             │
+             ▼
+    ┌─────────────────────────────────┐
+    │      PREDICTIONS SAVED          │
+    │  LoRA: results/predictions/     │
+    │  ICL: results/icl/{model}/...   │
+    └────────┬────────────────────────┘
+             │
+             ▼
+    ┌─────────────────────────────────┐
+    │        EVALUATION               │
+    │  evaluate.py                    │
+    │  - Execution Accuracy           │
+    │  - Program Accuracy             │
+    └─────────────────────────────────┘
 ```
 
 ---
 
-## What Gets Saved
+## Detailed Setup
 
-### After Training
+### Prerequisites
 
-**LoRA** (`results/lora/`):
-```
-results/lora/
-├── Meta-Llama-3-8B-Instruct/
-│   ├── final_model/              ← Main output
-│   │   ├── adapter_config.json
-│   │   ├── adapter_model.bin     (~50MB)
-│   │   └── tokenizer files
-│   ├── checkpoint-500/           ← Intermediate checkpoints
-│   ├── checkpoint-1000/
-│   └── logs/
-└── Mistral-7B-Instruct-v0.2/
-    └── (same structure)
-```
+1. **Python Environment**
+   ```bash
+   python --version  # Should be 3.10+
+   ```
 
-**QLoRA** (`results/qlora/`):
-```
-results/qlora/
-├── Meta-Llama-3-8B-Instruct/
-│   └── final_model/              ← Trained adapters
-└── Mistral-7B-Instruct-v0.2/
-    └── final_model/              ← Trained adapters
-```
+2. **GPU Requirements**
+   - VRAM: 24GB+ recommended
+   - CUDA: 11.8+
+   - Tested on: NVIDIA A10G (AWS g5.2xlarge)
 
-**ICL**: No training, nothing saved
+3. **Storage**
+   - Code: ~500 MB
+   - Data: ~50 MB
+   - Models (cached): ~15 GB per model
+   - Adapters: ~50 MB per model
+   - Results: ~100 MB
 
-### After Inference
+### Installation Steps
 
-**Predictions** (`results/predictions/`):
-```
-results/predictions/
-├── Meta-Llama-3-8B-Instruct_lora_predictions.json
-├── Meta-Llama-3-8B-Instruct_qlora_predictions.json
-├── Meta-Llama-3-8B-Instruct_predictions.json      # ICL
-├── Mistral-7B-Instruct-v0.2_lora_predictions.json
-├── Mistral-7B-Instruct-v0.2_qlora_predictions.json
-└── Mistral-7B-Instruct-v0.2_predictions.json      # ICL
+#### Option 1: Conda (Recommended)
+```bash
+# Create environment from file
+conda env create -f environment.yml
+conda activate finqa-mini
+
+# Verify installation
+python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.cuda.is_available()}')"
 ```
 
-**Prediction Format** (unified across all methods):
+#### Option 2: Pip + Virtual Environment
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# Verify installation
+python -c "import torch; print(f'PyTorch: {torch.__version__}'); print(f'CUDA: {torch.cuda.is_available()}')"
+```
+
+### Data Preparation
+
+```bash
+cd src
+python data_loader_simplified.py
+```
+
+**What this does**:
+1. Downloads FinQA from HuggingFace (automatic)
+2. Extracts essential fields: id, question, pre_text, table, program, answer
+3. Saves to `data/simplified/` as JSON files
+4. Creates train/dev/test splits
+
+**Output**:
+```
+data/simplified/
+├── train_simplified.json  (6,251 examples, ~8 MB)
+├── dev_simplified.json    (883 examples, ~1 MB)
+└── test_simplified.json   (1,147 examples, ~1.5 MB)
+```
+
+---
+
+## Running Experiments
+
+### Using the Master Script
+
+The `run_all_experiments.sh` script provides a unified interface for all experiments.
+
+```bash
+# Make executable (first time only)
+chmod +x run_all_experiments.sh
+
+# View all available commands
+./run_all_experiments.sh
+```
+
+### Training Commands
+
+#### Train LoRA - Mistral
+```bash
+./run_all_experiments.sh train-lora-mistral
+```
+- Duration: ~2.5-3 hours
+- Memory: ~20 GB VRAM
+- Output: `results/lora/Mistral-7B-Instruct-v0.2/final_model/`
+
+#### Train LoRA - Llama
+```bash
+./run_all_experiments.sh train-lora-llama
+```
+- Duration: ~2.5-3 hours
+- Memory: ~20 GB VRAM
+- Settings: batch_size=1, gradient_accumulation=16 (OOM prevention)
+- Output: `results/lora/Meta-Llama-3-8B-Instruct/final_model/`
+
+### Inference Commands
+
+#### LoRA Inference - Mistral
+```bash
+./run_all_experiments.sh infer-lora-mistral
+```
+- Duration: ~20-30 minutes
+- Loads: `results/lora/Mistral-7B-Instruct-v0.2/final_model/`
+- Output: `results/predictions/Mistral-7B-Instruct-v0.2_lora_predictions.json`
+
+#### LoRA Inference - Llama
+```bash
+./run_all_experiments.sh infer-lora-llama
+```
+- Duration: ~20-30 minutes
+- Loads: `results/lora/Meta-Llama-3-8B-Instruct/final_model/`
+- Output: `results/predictions/Meta-Llama-3-8B-Instruct_lora_predictions.json`
+
+#### ICL Inference - Mistral
+```bash
+./run_all_experiments.sh infer-icl-mistral
+```
+- Duration: ~20-30 minutes
+- Config: `configs/icl_config_1.yaml` (5-shot diverse)
+- Output: `results/icl/Mistral-7B-Instruct-v0.2/5shot_diverse/`
+
+#### ICL Inference - Llama
+```bash
+./run_all_experiments.sh infer-icl-llama
+```
+- Duration: ~20-30 minutes
+- Config: `configs/icl_config_1.yaml` (5-shot diverse)
+- Output: `results/icl/Meta-Llama-3-8B-Instruct/5shot_diverse/`
+
+### Running on AWS EC2 with nohup
+
+For long-running processes, use nohup to keep running after disconnect:
+
+```bash
+# Activate environment and run in background
+cd ~/FinQA-Mini-Project
+source venv/bin/activate
+
+# Training (long-running)
+nohup ./run_all_experiments.sh train-lora-mistral > train_mistral.log 2>&1 &
+
+# Monitor progress
+tail -f train_mistral.log
+
+# Check if still running
+ps aux | grep train_lora
+```
+
+---
+
+## Results Organization
+
+### LoRA Results
+
+```
+results/
+├── lora/
+│   ├── Mistral-7B-Instruct-v0.2/
+│   │   └── final_model/
+│   │       ├── adapter_config.json
+│   │       ├── adapter_model.bin (~50 MB)
+│   │       └── README.md
+│   └── Meta-Llama-3-8B-Instruct/
+│       └── final_model/
+│           ├── adapter_config.json
+│           ├── adapter_model.bin (~50 MB)
+│           └── README.md
+│
+└── predictions/
+    ├── Mistral-7B-Instruct-v0.2_lora_predictions.json
+    └── Meta-Llama-3-8B-Instruct_lora_predictions.json
+```
+
+### ICL Results
+
+```
+results/
+└── icl/
+    ├── Mistral-7B-Instruct-v0.2/
+    │   └── 5shot_diverse/
+    │       ├── predictions.json       # Same format as LoRA
+    │       ├── config.yaml            # Exact config used
+    │       └── metadata.json          # Run info
+    └── Meta-Llama-3-8B-Instruct/
+        └── 5shot_diverse/
+            ├── predictions.json
+            ├── config.yaml
+            └── metadata.json
+```
+
+### Prediction Format (Both Methods)
+
 ```json
 [
   {
-    "id": "test_0",
-    "question": "What is the net income?",
-    "predicted_program": "add(1234, 5678)",
-    "predicted_answer": "6912",
-    "gold_program": "add(1234, 5678)",
-    "gold_answer": "6912",
-    "raw_output": "Program: add(1234, 5678)\nAnswer: 6912"
+    "id": "2951",
+    "question": "what was the percentage change in total assets from 2016 to 2017?",
+    "predicted_program": "divide(subtract(14280, 13292), 13292)",
+    "predicted_answer": "0.0743",
+    "gold_program": "divide(subtract(14280, 13292), 13292)",
+    "gold_answer": "0.0743",
+    "raw_output": "divide(subtract(14280, 13292), 13292)"
   }
 ]
+```
+
+### Metadata File (ICL Only)
+
+```json
+{
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "num_shots": 5,
+  "selection_method": "diverse",
+  "temperature": 0.1,
+  "num_predictions": 1147,
+  "timestamp": "2025-11-30T17:45:23",
+  "config_file": "../configs/icl_config_1.yaml"
+}
 ```
 
 ---
 
 ## Command Reference
 
-### Quick Commands
+### Training
 
 ```bash
-# Full pipeline (train + infer)
-./run_all_experiments.sh full                    # 12-17 hours
-
-# Training only
-./run_all_experiments.sh train-all               # 10-14 hours
-
-# Inference only (after training)
-./run_all_experiments.sh infer-all               # 2-3 hours
-
-# Quick test
-./run_all_experiments.sh test                    # ~5 minutes
-```
-
-### Individual Training
-
-```bash
-# LoRA
-./run_all_experiments.sh train-lora-llama        # 2.5-3 hours
-./run_all_experiments.sh train-lora-mistral      # 2.5-3 hours
-
-# QLoRA
-./run_all_experiments.sh train-qlora-llama       # 2.5-3.5 hours
-./run_all_experiments.sh train-qlora-mistral     # 2.5-3.5 hours
-```
-
-### Individual Inference
-
-```bash
-# LoRA
-./run_all_experiments.sh infer-lora-llama        # 20-30 minutes
-./run_all_experiments.sh infer-lora-mistral      # 20-30 minutes
-
-# QLoRA
-./run_all_experiments.sh infer-qlora-llama       # 20-30 minutes
-./run_all_experiments.sh infer-qlora-mistral     # 20-30 minutes
-
-# ICL
-./run_all_experiments.sh infer-icl-llama         # 20-30 minutes
-./run_all_experiments.sh infer-icl-mistral       # 20-30 minutes
-```
-
-### Manual Commands (Advanced)
-
-**Training**:
-```bash
+# LoRA training (manual)
 cd src
-
-# LoRA
 python train_lora.py \
-    --model_name meta-llama/Meta-Llama-3-8B-Instruct \
-    --data_dir ../data/simplified \
-    --output_dir ../results/lora \
-    --epochs 3 \
-    --batch_size 4 \
-    --gradient_accumulation_steps 4 \
-    --learning_rate 2e-4
-
-# QLoRA
-python train_qlora.py \
-    --model_name meta-llama/Meta-Llama-3-8B-Instruct \
-    --data_dir ../data/simplified \
-    --output_dir ../results/qlora \
-    --epochs 3 \
-    --batch_size 4 \
-    --gradient_accumulation_steps 4 \
-    --learning_rate 2e-4
+  --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+  --data_dir ../data/simplified \
+  --output_dir ../results/lora \
+  --epochs 3 \
+  --batch_size 4 \
+  --gradient_accumulation_steps 4 \
+  --learning_rate 2e-4
 ```
 
-**Inference**:
-```bash
-cd src
+### Inference
 
-# LoRA/QLoRA
+```bash
+# LoRA inference (manual)
+cd src
 python inference.py \
-    --model_name meta-llama/Meta-Llama-3-8B-Instruct \
-    --adapter_path ../results/lora/Meta-Llama-3-8B-Instruct/final_model \
-    --method lora \
-    --data_dir ../data/simplified \
-    --output_dir ../results/predictions \
-    --temperature 0.1
+  --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+  --adapter_path ../results/lora/Mistral-7B-Instruct-v0.2/final_model \
+  --method lora \
+  --data_dir ../data/simplified \
+  --output_dir ../results/predictions \
+  --temperature 0.1
 
-# ICL
+# ICL inference (manual)
 python icl_inference.py \
-    --model_name meta-llama/Meta-Llama-3-8B-Instruct \
-    --data_dir ../data/simplified \
-    --output_dir ../results/predictions \
-    --num_shots 5 \
-    --temperature 0.1
+  --config ../configs/icl_config_1.yaml \
+  --model_name mistralai/Mistral-7B-Instruct-v0.2 \
+  --data_dir ../data/simplified \
+  --output_dir ../results
 ```
 
-**Evaluation**:
+### Evaluation
+
 ```bash
 cd src
 
+# Evaluate LoRA predictions
 python evaluate.py \
-    --predictions_file ../results/predictions/Meta-Llama-3-8B-Instruct_lora_predictions.json
+  --predictions_file ../results/predictions/Mistral-7B-Instruct-v0.2_lora_predictions.json
+
+# Evaluate ICL predictions
+python evaluate.py \
+  --predictions_file ../results/icl/Mistral-7B-Instruct-v0.2/5shot_diverse/predictions.json
+```
+
+**Output**:
+```
+Evaluation Results:
+Total predictions: 1147
+Execution accuracy: 0.4523 (correct numerical answer)
+Program accuracy: 0.3891 (correct reasoning program)
 ```
 
 ---
 
 ## AWS Setup Guide
 
-### Recommended Instance: g5.2xlarge
+### Instance Selection
 
-**Specs**:
+**Recommended**: g5.2xlarge
 - GPU: NVIDIA A10G (24GB VRAM)
 - vCPUs: 8
-- RAM: 32GB
-- Storage: 200GB+ recommended
-- Cost: $1.20/hr (or $0.36/hr with spot instances)
+- RAM: 32 GB
+- Cost: ~$1.20/hour (on-demand)
+- Perfect for: LoRA training + inference
+
+**Alternative**: g5.xlarge
+- GPU: NVIDIA A10G (24GB VRAM)
+- vCPUs: 4
+- RAM: 16 GB
+- Cost: ~$1.00/hour
+- Works but slower (fewer CPUs for data loading)
 
 ### Setup Steps
 
-1. **Launch Instance**:
-```bash
-# Use AWS CLI or Console
-# Select: g5.2xlarge, Deep Learning AMI, 200GB storage
+1. **Launch Instance**
+   ```bash
+   # Use Deep Learning AMI (Ubuntu 20.04) - has CUDA pre-installed
+   # Security group: Allow SSH (port 22) from your IP
+   ```
+
+2. **Connect to Instance**
+   ```bash
+   ssh -i your-key.pem ec2-user@your-instance-ip
+   ```
+
+3. **Clone Repository**
+   ```bash
+   git clone https://github.com/abhisvakil/FinQA-Mini-Project.git
+   cd FinQA-Mini-Project
+   ```
+
+4. **Setup Environment**
+   ```bash
+   # Create virtual environment
+   python3 -m venv venv
+   source venv/bin/activate
+   
+   # Install dependencies
+   pip install --upgrade pip
+   pip install -r requirements.txt
+   ```
+
+5. **Prepare Data**
+   ```bash
+   cd src
+   python data_loader_simplified.py
+   cd ..
+   ```
+
+6. **Run Experiments**
+   ```bash
+   # Make script executable
+   chmod +x run_all_experiments.sh
+   
+   # Run with nohup (stays running after disconnect)
+   source venv/bin/activate
+   nohup ./run_all_experiments.sh train-lora-mistral > train.log 2>&1 &
+   
+   # Monitor
+   tail -f train.log
+   ```
+
+### Cost Estimates
+
+**g5.2xlarge ($1.20/hr)**:
+- LoRA training (2 models): ~6 hours = $7.20
+- Inference (all methods): ~2 hours = $2.40
+- Total: ~8 hours = **$9.60**
+
+**Tips to Save**:
+1. Use Spot Instances (50-70% discount)
+2. Stop instance when not in use
+3. Use S3 for long-term storage (cheaper than EBS)
+4. Set up billing alerts
+
+---
+
+## Troubleshooting
+
+### Common Issues
+
+#### 1. CUDA Out of Memory (OOM)
+
+**Symptoms**:
+```
+RuntimeError: CUDA out of memory. Tried to allocate 1.50 GiB
 ```
 
-2. **Install Dependencies**:
+**Solutions**:
 ```bash
-ssh -i your-key.pem ubuntu@your-instance-ip
+# For Llama training, use smaller batch size
+# Edit run_all_experiments.sh or configs/lora_config.yaml
+batch_size: 1
+gradient_accumulation_steps: 16
 
-# Clone repository
-git clone https://github.com/your-repo/FinQA-Mini-Project.git
-cd FinQA-Mini-Project
+# For inference, use 8-bit quantization
+--load_in_8bit
+```
 
-# Create environment
-conda env create -f environment.yml
-conda activate finqa-mini
+#### 2. Module Not Found
 
-# Or use pip
+**Symptoms**:
+```
+ModuleNotFoundError: No module named 'peft'
+```
+
+**Solution**:
+```bash
+# Make sure virtual environment is activated
+source venv/bin/activate  # or conda activate finqa-mini
+
+# Reinstall dependencies
 pip install -r requirements.txt
 ```
 
-3. **Prepare Data**:
+#### 3. Permission Denied (AWS)
+
+**Symptoms**:
+```
+./run_all_experiments.sh: Permission denied
+```
+
+**Solution**:
 ```bash
+chmod +x run_all_experiments.sh
+```
+
+#### 4. Config File Not Found
+
+**Symptoms**:
+```
+FileNotFoundError: [Errno 2] No such file or directory: '../configs/icl_config.yaml'
+```
+
+**Solution**:
+```bash
+# Use correct config file name
+ls configs/  # Check available configs
+
+# Update command to use existing config
+python icl_inference.py --config ../configs/icl_config_1.yaml ...
+```
+
+#### 5. Slow Data Loading
+
+**Symptoms**:
+- Training stuck at "Loading data..."
+- Takes >10 minutes to load dataset
+
+**Solutions**:
+```bash
+# Use more data loader workers (in train_lora.py)
+dataloader_num_workers: 4
+
+# Or process data once and cache
 cd src
-python data_loader_simplified.py
-cd ..
+python data_loader_simplified.py  # Creates cached version
 ```
 
-4. **Run Experiments**:
-```bash
-# Quick test first
-./run_all_experiments.sh test
+### Debug Mode
 
-# If successful, run full pipeline
-./run_all_experiments.sh full
-```
-
-### Cost Estimates (g5.2xlarge @ $1.20/hr)
-
-| Task | Duration | On-Demand Cost | Spot Cost (70% off) |
-|------|----------|----------------|---------------------|
-| LoRA Training (both) | 5-6 hrs | $6-7.20 | $1.80-2.16 |
-| QLoRA Training (both) | 5-7 hrs | $6-8.40 | $1.80-2.52 |
-| All Inference | 2-3 hrs | $2.40-3.60 | $0.72-1.08 |
-| **TOTAL** | **12-17 hrs** | **$14-21** | **$4.32-6.30** |
-
-**Recommendation**: Use spot instances for 70% savings!
-
-### Monitoring Progress
+Run scripts with verbose logging:
 
 ```bash
-# Check training progress
-tail -f results/lora/Meta-Llama-3-8B-Instruct/logs/training_logs.txt
+# Training
+python train_lora.py --model_name ... --verbose
+
+# Inference
+python inference.py --model_name ... --verbose
 
 # Check GPU usage
-nvidia-smi
-
-# Check disk space
-df -h
+watch -n 1 nvidia-smi
 ```
 
 ---
 
 ## Implementation Details
 
-### Data Format
+### LoRA Configuration
 
-**Input** (simplified from FinQA):
-```json
-{
-  "id": "example_0",
-  "question": "What is the revenue growth?",
-  "pre_text": ["Text context..."],
-  "post_text": ["More context..."],
-  "table": [["Header1", "Header2"], ["Value1", "Value2"]],
-  "program": ["divide", "subtract", "..."],
-  "answer": "0.234"
-}
+```yaml
+# configs/lora_config.yaml
+lora:
+  r: 8                      # Rank (bottleneck dimension)
+  alpha: 16                 # Scaling factor (alpha/r = 2)
+  target_modules:           # Which layers to adapt
+    - q_proj                # Query projection
+    - v_proj                # Value projection
+    - k_proj                # Key projection
+    - o_proj                # Output projection
+  dropout: 0.05
+  bias: none
+  task_type: CAUSAL_LM
+
+training:
+  num_epochs: 3
+  per_device_train_batch_size: 4    # Mistral: 4, Llama: 1
+  gradient_accumulation_steps: 4     # Mistral: 4, Llama: 16
+  learning_rate: 2e-4
+  warmup_ratio: 0.03
+  lr_scheduler_type: linear
+  optim: paged_adamw_8bit           # Memory efficient optimizer
+  save_strategy: epoch
+  logging_steps: 50
 ```
 
-**Operations** (6 total):
+**Why these settings?**
+- r=8, alpha=16: Good balance of capacity and efficiency
+- Target modules: Attention layers learn task patterns
+- Dropout: Prevents overfitting
+- Paged optimizer: Reduces memory usage
+
+### ICL Configuration
+
+```yaml
+# configs/icl_config_1.yaml
+model:
+  model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"
+  torch_dtype: "bfloat16"
+  device_map: "auto"
+  load_in_8bit: false
+
+generation:
+  max_new_tokens: 256
+  temperature: 0.1          # Low for deterministic output
+  top_p: 0.95
+  do_sample: true
+
+icl:
+  num_shots: 5              # Number of examples in prompt
+  example_selection: diverse # diverse, random, or similarity
+
+system_prompt: |
+  You are a financial analyst assistant. Generate executable reasoning programs.
+  
+  Available Operations:
+  - add(a, b), subtract(a, b), multiply(a, b)
+  - divide(a, b), greater(a, b), exp(a, b)
+```
+
+**Few-shot Example Structure**:
+```
+Example 1:
+Question: What was the percentage change?
+
+Text:
+- Total assets in 2016: $13,292 million
+- Total assets in 2017: $14,280 million
+
+Table:
+| Year | Assets |
+| 2016 | 13292  |
+| 2017 | 14280  |
+
+Program: divide(subtract(14280, 13292), 13292)
+```
+
+### Evaluation Metrics
+
+**Execution Accuracy**:
+- Execute predicted program
+- Compare numerical result to gold answer
+- Tolerance: ±0.001 for floating point
+
+**Program Accuracy**:
+- Exact string match after normalization
+- Order of operations must match
+- Variable names must match
+
+**Code** (from `evaluate.py`):
 ```python
-add(a, b)        # a + b
-subtract(a, b)   # a - b
-multiply(a, b)   # a * b
-divide(a, b)     # a / b
-greater(a, b)    # max(a, b)
-exp(a, b)        # a ** b
-```
+def execution_accuracy(pred_answer, gold_answer):
+    """Check if predicted answer matches gold within tolerance."""
+    try:
+        pred_val = float(pred_answer)
+        gold_val = float(gold_answer)
+        return abs(pred_val - gold_val) < 0.001
+    except:
+        return pred_answer.strip() == gold_answer.strip()
 
-### Model Configurations
-
-**LoRA**:
-```yaml
-r: 8                    # Rank
-lora_alpha: 16          # Scaling factor
-target_modules:
-  - q_proj
-  - v_proj
-  - k_proj
-  - o_proj
-lora_dropout: 0.05
-bias: "none"
-task_type: "CAUSAL_LM"
-```
-
-**QLoRA**:
-```yaml
-load_in_4bit: true
-bnb_4bit_compute_dtype: bfloat16
-bnb_4bit_use_double_quant: true
-bnb_4bit_quant_type: "nf4"
-+ LoRA config above
-```
-
-**ICL**:
-```yaml
-num_shots: 5
-selection_strategy: "diverse"
-temperature: 0.1
-max_new_tokens: 256
-```
-
-### Training Parameters
-
-```python
-epochs: 3
-batch_size: 4
-gradient_accumulation_steps: 4
-learning_rate: 2e-4
-warmup_ratio: 0.03
-weight_decay: 0.001
-fp16: false
-bf16: true
-gradient_checkpointing: true
-max_grad_norm: 0.3
+def program_accuracy(pred_program, gold_program):
+    """Check if predicted program matches gold exactly."""
+    pred_norm = normalize_program(pred_program)
+    gold_norm = normalize_program(gold_program)
+    return pred_norm == gold_norm
 ```
 
 ---
 
-## Troubleshooting
+## Best Practices
 
-### Out of Memory (OOM)
+### Training
+1. **Monitor GPU usage**: `watch -n 1 nvidia-smi`
+2. **Check logs regularly**: `tail -f train.log`
+3. **Save checkpoints**: Already configured (every epoch)
+4. **Use gradient accumulation**: Simulate larger batches
 
-**Problem**: `CUDA out of memory` error during training
+### Inference
+1. **Use low temperature** (0.1) for consistency
+2. **Batch processing** for speed (if memory allows)
+3. **Cache model** to avoid re-downloading
+4. **Save raw outputs** for debugging
 
-**Solutions**:
-1. Reduce batch size:
+### Comparison
+1. **Same test set** for all methods
+2. **Same temperature** (0.1) for fairness
+3. **Same base models** (no mixing versions)
+4. **Multiple random seeds** for ICL (if needed)
+
+---
+
+## Additional Notes
+
+### Model Caching
+
+Models are cached in `~/.cache/huggingface/`:
+- Llama-3-8B: ~15 GB
+- Mistral-7B: ~14 GB
+
+To change cache location:
+```bash
+export HF_HOME=/path/to/cache
+export TRANSFORMERS_CACHE=/path/to/cache
+```
+
+### Memory Optimization
+
+If hitting OOM:
+1. Reduce batch size to 1
+2. Increase gradient accumulation
+3. Use 8-bit quantization (`load_in_8bit=True`)
+4. Disable gradient checkpointing if not needed
+5. Clear cache: `torch.cuda.empty_cache()`
+
+### Extending to More Shots
+
+To run ICL with different num_shots:
+
+1. Copy config:
    ```bash
-   python train_lora.py --batch_size 2 --gradient_accumulation_steps 8
+   cp configs/icl_config_1.yaml configs/icl_config_3shot.yaml
    ```
 
-2. Use gradient checkpointing (already enabled)
-
-3. Reduce sequence length:
-   ```bash
-   python train_lora.py --max_length 1536
+2. Edit `num_shots`:
+   ```yaml
+   icl:
+     num_shots: 3  # or 10, 20, etc.
    ```
 
-4. Switch to QLoRA (more memory efficient)
-
-### Slow Training
-
-**Problem**: Training taking much longer than expected
-
-**Solutions**:
-1. Check GPU utilization:
-   ```bash
-   nvidia-smi
-   ```
-
-2. Ensure using GPU:
-   ```python
-   import torch
-   print(torch.cuda.is_available())  # Should be True
-   ```
-
-3. Reduce logging frequency:
-   ```bash
-   python train_lora.py --logging_steps 100
-   ```
-
-### Import Errors
-
-**Problem**: `ModuleNotFoundError` for transformers, peft, etc.
-
-**Solutions**:
-1. Reinstall dependencies:
-   ```bash
-   pip install -r requirements.txt --force-reinstall
-   ```
-
-2. Check Python version (requires 3.10+):
-   ```bash
-   python --version
-   ```
-
-3. Verify environment activation:
-   ```bash
-   conda activate finqa-mini
-   ```
-
-### Adapter Not Found
-
-**Problem**: `FileNotFoundError` when loading adapters for inference
-
-**Solutions**:
-1. Check adapter path exists:
-   ```bash
-   ls -la results/lora/Meta-Llama-3-8B-Instruct/final_model
-   ```
-
-2. Ensure training completed:
-   ```bash
-   # Check logs
-   cat results/lora/Meta-Llama-3-8B-Instruct/logs/training_logs.txt
-   ```
-
-3. Use correct model name in inference script
-
-### Poor Results
-
-**Problem**: Low accuracy or nonsensical outputs
-
-**Solutions**:
-1. Check data loading:
+3. Run inference:
    ```bash
    cd src
-   python data_loader_simplified.py
+   python icl_inference.py --config ../configs/icl_config_3shot.yaml ...
    ```
 
-2. Verify prediction format:
-   ```bash
-   cat results/predictions/*_predictions.json | head -50
-   ```
-
-3. Test with smaller sample:
-   ```bash
-   python train_lora.py --max_samples 100
-   ```
-
-4. Increase training epochs:
-   ```bash
-   python train_lora.py --epochs 5
-   ```
+Results automatically saved to `results/icl/{model}/3shot_diverse/`
 
 ---
 
-## Tips and Best Practices
+## Support & Resources
 
-### Before Starting
-
-- ✅ Test with 100 samples first (`--max_samples 100`)
-- ✅ Verify data is loaded correctly
-- ✅ Check disk space (need ~10GB)
-- ✅ Use spot instances on AWS for cost savings
-- ✅ Set up checkpointing for long runs
-
-### During Training
-
-- 📊 Monitor GPU usage with `nvidia-smi`
-- 📁 Check logs regularly: `tail -f results/lora/.../logs/training_logs.txt`
-- 💾 Verify checkpoints are being saved
-- ⏰ Estimate remaining time from progress bars
-
-### After Training
-
-- ✓ Verify adapters saved: `ls results/lora/*/final_model`
-- ✓ Check adapter file size (~50MB)
-- ✓ Test inference on small sample first
-- ✓ Compare outputs across methods
-
-### Optimization
-
-- **Parallel Training**: Train Llama and Mistral on separate GPUs if available
-- **ICL First**: Run ICL inference while models are training (no dependencies)
-- **Batch Inference**: Process multiple examples together for faster inference
-- **Checkpoint Resume**: Save time by resuming from checkpoints if interrupted
-
----
-
-## Timeline Summary
-
-| Phase | Tasks | Duration | Cost (g5.2xlarge) |
-|-------|-------|----------|-------------------|
-| **Setup** | Environment, data prep | 30 min | $0.60 |
-| **Training** | LoRA + QLoRA (2 models) | 10-14 hrs | $12-17 |
-| **Inference** | All 6 configurations | 2-3 hrs | $2.40-3.60 |
-| **Evaluation** | Calculate metrics | 30 min | $0.60 |
-| **TOTAL** | | **13-18 hrs** | **$15-22** |
-
-*Spot instances reduce cost by 70%: ~$5-7 total*
-
----
-
-## Next Steps After Experiments
-
-1. **Analyze Results**: Compare metrics across all 6 configurations
-2. **Error Analysis**: Examine failed predictions to understand limitations
-3. **Visualizations**: Create comparison charts and tables
-4. **Report Writing**: Document findings and insights
-5. **Optimization**: Fine-tune hyperparameters for better results
-
----
-
-## Resources
-
+- **GitHub Issues**: Report bugs or ask questions
 - **FinQA Paper**: https://arxiv.org/abs/2109.00122
 - **LoRA Paper**: https://arxiv.org/abs/2106.09685
-- **QLoRA Paper**: https://arxiv.org/abs/2305.14314
-- **Hugging Face PEFT**: https://github.com/huggingface/peft
-- **Transformers Docs**: https://huggingface.co/docs/transformers
+- **HuggingFace PEFT**: https://huggingface.co/docs/peft
+
+---
+
+**Last Updated**: November 30, 2025
