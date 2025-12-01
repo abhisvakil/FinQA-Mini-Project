@@ -69,15 +69,21 @@ def finqa_to_yaml_examples(selected: List[Dict]) -> List[Dict]:
     """
     out = []
     for ex in selected:
-        # Build table as markdown string
-        table_str = ""
+        # Build context with pre_text and table
+        context_str = ""
+        
+        # Add pre_text if present
+        if ex.get("pre_text"):
+            context_str += " ".join(ex["pre_text"][:10]) + "\n"
+        
+        # Add table as markdown string
         if ex.get("table"):
-            table_str = "Table:\n"
+            context_str += "Table:\n"
             header = " | ".join(ex["table"][0])
-            table_str += f"| {header} |\n"
+            context_str += f"| {header} |\n"
             for row in ex["table"][1:]:
                 row_str = " | ".join(str(cell) for cell in row)
-                table_str += f"| {row_str} |\n"
+                context_str += f"| {row_str} |\n"
         
         # Extract program and answer
         program = " ".join(ex['program']) if isinstance(ex.get('program'), list) else ex.get('program', '')
@@ -85,7 +91,7 @@ def finqa_to_yaml_examples(selected: List[Dict]) -> List[Dict]:
         
         out.append({
             "question": ex["question"],
-            "context": table_str.strip(),
+            "context": context_str.strip(),
             "program": program,
             "answer": answer
         })
