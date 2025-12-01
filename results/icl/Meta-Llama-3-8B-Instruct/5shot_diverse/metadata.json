@@ -1,9 +1,0 @@
-{
-  "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-  "num_shots": 5,
-  "selection_method": "diverse",
-  "temperature": 0.1,
-  "num_predictions": 1147,
-  "timestamp": "2025-11-30T17:57:18.939921",
-  "config_file": "../configs/icl_config_1.yaml"
-}
