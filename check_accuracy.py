@@ -4,89 +4,21 @@
 import json
 import sys
 
-# Sample predictions from the output
-predictions = [
-  {
-    "id": "ETR/2016/page_23.pdf-2",
-    "question": "what is the net change in net revenue during 2015 for entergy corporation?",
-    "predicted_program": "add(const_5735, 187), add(#0, 95), subtract(#0, 32), subtract(#0, 35), subtract(#0, 107), add(#0, 14)",
-    "predicted_answer": "5829.0 - 32.0 - 35.0 + 14.0 = 5762.0",
-    "gold_program": "subtract(5829, 5735)",
-    "gold_answer": "94.0"
-  },
-  {
-    "id": "INTC/2015/page_41.pdf-4",
-    "question": "what percentage of total facilities as measured in square feet are leased?",
-    "predicted_program": "divide(const_8_1, const_56_0), multiply(#0, 100)",
-    "predicted_answer": "0.14516129",
-    "gold_program": "divide(8.1, 56.0)",
-    "gold_answer": "0.14464"
-  },
-  {
-    "id": "ADI/2011/page_61.pdf-2",
-    "question": "what is the percentage change in cash flow hedges in 2011 compare to the 2010?",
-    "predicted_program": "subtract(const_20692, 2014)",
-    "predicted_answer": "20488.0",
-    "gold_program": "subtract(153.7, 139.9), divide(#0, 139.9)",
-    "gold_answer": "0.09864"
-  },
-  {
-    "id": "FIS/2010/page_70.pdf-2",
-    "question": "what portion of total purchase price is related to stock awards?",
-    "predicted_program": "divide(const_121.4, const_4187.8)",
-    "predicted_answer": "0.028974418604651165",
-    "gold_program": "divide(121.4, 4187.8)",
-    "gold_answer": "0.02899"
-  },
-  {
-    "id": "MAS/2017/page_27.pdf-2",
-    "question": "what was the difference in percentage cumulative total shareholder return on masco common stock versus the s&p 500 index for the five year period ended 2017?",
-    "predicted_program": "subtract(divide(const_318.46, const_206.49), 1)",
-    "predicted_answer": "0.6152954594817461",
-    "gold_program": "subtract(318.46, const_100), divide(#0, const_100), subtract(206.49, const_100), divide(#2, const_100), subtract(#1, #3)",
-    "gold_answer": "1.1197"
-  },
-  {
-    "id": "SYY/2006/page_71.pdf-1",
-    "question": "what was the percentage change in total rental expense under operating leases from july 2 , 2005 to july 1 , 2006?",
-    "predicted_program": "divide(const_25666000, const_33329000), multiply(#0, 100)",
-    "predicted_answer": "0.76842157",
-    "gold_program": "subtract(92710000, 86842000), divide(#0, 86842000)",
-    "gold_answer": "0.06757"
-  },
-  {
-    "id": "AES/2010/page_227.pdf-3",
-    "question": "what percent of total recourse debt is current?",
-    "predicted_program": "divide(const_497, const_4612), multiply(#0, 100)",
-    "predicted_answer": "0.10335823585304683",
-    "gold_program": "divide(463, 4612)",
-    "gold_answer": "0.10039"
-  },
-  {
-    "id": "GS/2015/page_188.pdf-2",
-    "question": "what percentage of future minimum rental payments are due in 2018?",
-    "predicted_program": "divide(const_301, sum(const_317, const_313, const_301, const_258, const_226, const_1160)) * 100",
-    "predicted_answer": "0.011715729166666667",
-    "gold_program": "divide(301, 2575)",
-    "gold_answer": "0.11689"
-  },
-  {
-    "id": "MO/2016/page_19.pdf-1",
-    "question": "did altria outperform the s&p 500?",
-    "predicted_program": "greater(286.61, 198.09)",
-    "predicted_answer": "True",
-    "gold_program": "greater(286.61, 198.09)",
-    "gold_answer": "yes"
-  },
-  {
-    "id": "CMCSA/2015/page_112.pdf-2",
-    "question": "what was the change in unrecognized tax benefits from the end of 2014 to the end of 2015?",
-    "predicted_program": "subtract(const_1171, const_1136)",
-    "predicted_answer": "35.0",
-    "gold_program": "subtract(1136, 1171)",
-    "gold_answer": "-35.0"
-  }
-]
+# Load predictions from file
+if len(sys.argv) > 1:
+    pred_file = sys.argv[1]
+else:
+    # Default to latest test results
+    pred_file = 'results_test/Mistral-7B-Instruct-v0.2_icl_predictions_latest.json'
+
+try:
+    with open(pred_file, 'r') as f:
+        predictions = json.load(f)
+    print(f"Loaded {len(predictions)} predictions from: {pred_file}")
+except FileNotFoundError:
+    print(f"Error: File not found: {pred_file}")
+    print("Usage: python check_accuracy.py [path/to/predictions.json]")
+    sys.exit(1)
 
 print("Analyzing predictions:")
 print("=" * 80)
