@@ -1,8 +1,60 @@
 #!/usr/bin/env python3
-"""Quick script to check accuracy of predictions"""
+"""Script to check accuracy of predictions using official FinQA evaluation"""
 
 import json
 import sys
+import os
+
+# Add src directory to path for evaluate module
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+from evaluate import evaluate_result, program_tokenization
+
+def convert_predictions_format(predictions, output_file):
+    """
+    Convert our prediction format to the format expected by evaluate.py
+    Our format: {id, question, predicted_program, predicted_answer, gold_program, gold_answer, raw_output}
+    Expected format: {id, predicted: [program tokens]}
+    """
+    converted = []
+    for pred in predictions:
+        # Convert program string to token list
+        program_str = pred['predicted_program']
+        
+        # Split by comma to get individual operations
+        operations = [op.strip() for op in program_str.split(',') if op.strip()]
+        
+        # Tokenize each operation
+        tokens = []
+        for op in operations:
+            # Parse operation like "subtract(5829, 5735)"
+            if '(' in op and ')' in op:
+                func_name = op.split('(')[0].strip()
+                args = op.split('(')[1].rstrip(')').strip()
+                arg_list = [arg.strip() for arg in args.split(',')]
+                
+                # Build token list: ["subtract", "(", "5829", "5735", ")"]
+                tokens.append(func_name)
+                tokens.append('(')
+                tokens.extend(arg_list)
+                tokens.append(')')
+            else:
+                # Handle cases where it might just be a number or reference
+                if op:
+                    tokens.append(op)
+        
+        # Add EOF token
+        tokens.append('EOF')
+        
+        converted.append({
+            'id': pred['id'],
+            'predicted': tokens
+        })
+    
+    # Write converted predictions
+    with open(output_file, 'w') as f:
+        json.dump(converted, f, indent=2)
+    
+    return output_file
 
 # Load predictions from file
 if len(sys.argv) > 1:
@@ -11,84 +63,50 @@ else:
     # Default to latest test results
     pred_file = 'results_test/Mistral-7B-Instruct-v0.2_icl_predictions_latest.json'
 
+# Get test file path
+if len(sys.argv) > 2:
+    test_file = sys.argv[2]
+else:
+    test_file = 'data/simplified/test.json'
+
 try:
     with open(pred_file, 'r') as f:
         predictions = json.load(f)
     print(f"Loaded {len(predictions)} predictions from: {pred_file}")
 except FileNotFoundError:
     print(f"Error: File not found: {pred_file}")
-    print("Usage: python check_accuracy.py [path/to/predictions.json]")
+    print("Usage: python check_accuracy.py [path/to/predictions.json] [path/to/test.json]")
     sys.exit(1)
 
-print("Analyzing predictions:")
+# Check if test file exists
+if not os.path.exists(test_file):
+    print(f"Error: Test file not found: {test_file}")
+    sys.exit(1)
+
+print("=" * 80)
+print("Converting predictions to official format...")
 print("=" * 80)
 
-correct_programs = 0
-correct_answers = 0
+# Convert predictions to expected format
+converted_file = pred_file.replace('.json', '_converted.json')
+convert_predictions_format(predictions, converted_file)
 
-for i, pred in enumerate(predictions, 1):
-    pred_prog = pred['predicted_program'].strip()
-    gold_prog = pred['gold_program'].strip()
-    
-    pred_ans = str(pred['predicted_answer']).strip()
-    gold_ans = str(pred['gold_answer']).strip()
-    
-    # Normalize programs for comparison (remove spaces, lowercase)
-    pred_prog_norm = pred_prog.replace(' ', '').lower()
-    gold_prog_norm = gold_prog.replace(' ', '').lower()
-    
-    program_match = pred_prog_norm == gold_prog_norm
-    
-    # Check answer (round to 2 decimals for comparison)
-    pred_rounded = None
-    gold_rounded = None
-    try:
-        pred_num = float(pred_ans.split()[0]) if pred_ans else None
-        gold_num = float(gold_ans)
-        # Round both to 2 decimal places
-        if pred_num is not None:
-            pred_rounded = round(pred_num, 2)
-            gold_rounded = round(gold_num, 2)
-            answer_match = pred_rounded == gold_rounded
-        else:
-            answer_match = False
-    except (ValueError, AttributeError):
-        # For non-numeric answers (like True/yes, False/no)
-        pred_lower = pred_ans.lower().strip()
-        gold_lower = gold_ans.lower().strip()
-        
-        # Handle boolean equivalents
-        true_values = ['true', 'yes', '1']
-        false_values = ['false', 'no', '0']
-        
-        if pred_lower in true_values and gold_lower in true_values:
-            answer_match = True
-        elif pred_lower in false_values and gold_lower in false_values:
-            answer_match = True
-        else:
-            answer_match = pred_lower in gold_lower or gold_lower in pred_lower
-    
-    if program_match:
-        correct_programs += 1
-    
-    if answer_match:
-        correct_answers += 1
-    
-    print(f"\n{i}. {pred['id']}")
-    print(f"   Question: {pred['question'][:70]}...")
-    print(f"   Program match: {'✓' if program_match else '✗'}")
-    print(f"   Answer match: {'✓' if answer_match else '✗'}")
-    if pred_rounded is not None and gold_rounded is not None:
-        print(f"   Pred: {pred_ans} → {pred_rounded} | Gold: {gold_ans} → {gold_rounded}")
-    if not program_match:
-        print(f"   Predicted: {pred_prog}")
-        print(f"   Gold:      {gold_prog}")
-    if not answer_match and (pred_rounded is None or gold_rounded is None):
-        print(f"   Pred answer: {pred_ans}")
-        print(f"   Gold answer: {gold_ans}")
+print("\n" + "="*80)
+print("Running official FinQA evaluation...")
+print("="*80 + "\n")
 
-print("\n" + "=" * 80)
-total = len(predictions)
-print(f"Results: {correct_programs}/{total} correct programs ({correct_programs*100//total}%)")
-print(f"         {correct_answers}/{total} correct answers ({correct_answers*100//total}%)")
-print("=" * 80)
+# Run evaluation
+try:
+    exe_acc, prog_acc = evaluate_result(converted_file, test_file)
+    
+    print("\n" + "="*80)
+    print(f"Final Results:")
+    print(f"  Total predictions: {len(predictions)}")
+    print(f"  Execution Accuracy: {exe_acc:.4f} ({exe_acc*100:.2f}%)")
+    print(f"  Program Accuracy: {prog_acc:.4f} ({prog_acc*100:.2f}%)")
+    print("="*80)
+except Exception as e:
+    print(f"Error during evaluation: {e}")
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
