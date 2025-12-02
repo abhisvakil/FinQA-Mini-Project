@@ -225,7 +225,7 @@ def run_inference(model, tokenizer, test_data: List[Dict], config: dict) -> List
         prompt = create_prompt_from_config(config, example)
         
         # Tokenize
-        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048)
+        inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=8192)
         inputs = {k: v.to(model.device) for k, v in inputs.items()}
         
         # Generate
