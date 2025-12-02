@@ -5,9 +5,9 @@ import json
 import sys
 import os
 
-# Add src directory to path for evaluate module
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-from evaluate import evaluate_result, program_tokenization
+# Import from finqa_evaluate module in project root
+sys.path.insert(0, os.path.dirname(__file__))
+from finqa_evaluate import evaluate_result, program_tokenization
 
 def convert_predictions_format(predictions, output_file, test_data_dict=None):
     """
