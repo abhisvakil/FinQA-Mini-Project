@@ -171,7 +171,7 @@ def parse_model_output(output: str) -> tuple:
     # Clean up output
     output = output.strip()
     
-    # Try to extract Program and Answer
+    # Strategy 1: Look for "Program:" and "Answer:" markers
     if "Program:" in output:
         program_part = output.split("Program:")[1]
         if "Answer:" in program_part:
@@ -189,24 +189,53 @@ def parse_model_output(output: str) -> tuple:
         else:
             # Only program, no explicit answer - try to extract from next lines
             program = program_part.split('\n')[0].strip()
-    else:
-        # Fallback: try to extract from beginning if no Program: marker
-        lines = output.strip().split('\n')
-        if lines:
-            program = lines[0].strip()
     
-    # If no answer found yet, try to find a number in the output
-    if not answer and output:
-        # Look for standalone numbers (int or float) in the output
-        # Pattern: number that's on its own line or after the program
-        number_pattern = r'(?:^|\n)\s*(-?\d+\.?\d*(?:e[+-]?\d+)?)\s*(?:\n|$)'
-        matches = re.findall(number_pattern, output, re.MULTILINE)
-        if matches:
-            # Take the first number found after the program
-            answer = matches[0]
+    # Strategy 2: Look for program-like patterns at the start of lines
+    if not program:
+        # Match lines that start with operation names (add, subtract, etc.)
+        lines = output.strip().split('\n')
+        for line in lines:
+            line = line.strip()
+            # Check if line starts with a valid operation
+            if re.match(r'^(add|subtract|multiply|divide|greater|exp)\(', line):
+                program = line
+                break
+        
+        # If still no program, try to find after "### Final" marker
+        if not program and "### Final" in output:
+            after_final = output.split("### Final")[1].strip()
+            lines = after_final.split('\n')
+            for line in lines:
+                line = line.strip()
+                if re.match(r'^(add|subtract|multiply|divide|greater|exp)\(', line):
+                    program = line
+                    break
+    
+    # Strategy 3: Extract answer from "Answer:" marker (case-insensitive)
+    if not answer:
+        # Look for Answer: marker (case-insensitive)
+        answer_match = re.search(r'Answer:\s*([^\n]+)', output, re.IGNORECASE)
+        if answer_match:
+            answer = answer_match.group(1).strip()
+            # Remove trailing explanation text
+            answer = answer.split('This')[0].split('Therefore')[0].split('So')[0].strip()
+            # Remove trailing punctuation
+            answer = answer.rstrip('.,;:!?%')
+    
+    # Strategy 4: If no answer found, try to find a number after the program
+    if not answer and program and output:
+        # Look for numbers that appear after the program line
+        program_idx = output.find(program)
+        if program_idx != -1:
+            after_program = output[program_idx + len(program):]
+            # Look for standalone numbers
+            number_pattern = r'\b(-?\d+\.?\d*(?:e[+-]?\d+)?)\b'
+            matches = re.findall(number_pattern, after_program)
+            if matches:
+                # Take the first number found
+                answer = matches[0]
     
     # Clean up program: remove spaces between characters if present
-    # (handles cases where model outputs "s u b t r a c t" instead of "subtract")
     if program and ' ' in program and len(program.split()) > 10:
         # Likely has spaces between characters, try to fix common patterns
         program = program.replace(' s u b t r a c t ', ' subtract ').replace('s u b t r a c t', 'subtract')
@@ -217,9 +246,7 @@ def parse_model_output(output: str) -> tuple:
         program = program.replace(' e x p ', ' exp ').replace('e x p', 'exp')
         # Clean up multiple spaces
         program = ' '.join(program.split())
-    print("answer from parse model output")
-    print(answer)
-    print("-----------")
+    
     return program, answer
 
 
