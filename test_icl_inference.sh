@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Quick test script for ICL inference on N examples
-# Usage: ./test_icl_inference.sh <model_name> [num_samples]
-# Example: ./test_icl_inference.sh mistral 50
+# Usage: ./test_icl_inference.sh <model_name> [num_samples] [temperature]
+# Example: ./test_icl_inference.sh mistral 50 0.1
 
 set -e
 
@@ -14,6 +14,7 @@ NC='\033[0m'
 # Parse arguments
 MODEL_TYPE=${1:-mistral}
 NUM_SAMPLES=${2:-10}
+TEMPERATURE=${3:-0.1}
 
 if [ "$MODEL_TYPE" = "mistral" ]; then
     MODEL_NAME="mistralai/Mistral-7B-Instruct-v0.2"
@@ -27,6 +28,7 @@ fi
 echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}Testing ICL Inference on $NUM_SAMPLES Examples${NC}"
 echo -e "${GREEN}Model: $MODEL_NAME${NC}"
+echo -e "${GREEN}Temperature: $TEMPERATURE${NC}"
 echo -e "${GREEN}========================================${NC}\n"
 
 # Run inference with specified number of samples
@@ -36,7 +38,8 @@ python icl_inference.py \
     --model_name "$MODEL_NAME" \
     --data_dir data/simplified \
     --output_dir ../results_test \
-    --max_samples $NUM_SAMPLES
+    --max_samples $NUM_SAMPLES \
+    --temperature $TEMPERATURE
 
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}Test Complete!${NC}"

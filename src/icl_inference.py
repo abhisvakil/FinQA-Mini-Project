@@ -335,6 +335,8 @@ def main():
                         help="Output directory for predictions")
     parser.add_argument("--max_samples", type=int, default=None,
                         help="Max test samples (for quick testing)")
+    parser.add_argument("--temperature", type=float, default=None,
+                        help="Override temperature from config")
     
     args = parser.parse_args()
     
@@ -349,6 +351,10 @@ def main():
     # Override model if specified
     if args.model_name:
         config['model']['model_name_or_path'] = args.model_name
+    
+    # Override temperature if specified
+    if args.temperature is not None:
+        config['generation']['temperature'] = args.temperature
     
     model_name = config['model']['model_name_or_path']
     print(f"Model: {model_name}")
