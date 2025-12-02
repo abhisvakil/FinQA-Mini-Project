@@ -138,13 +138,18 @@ def create_prompt_from_config(config: dict, example: dict) -> str:
                 row_str = " | ".join(str(cell) for cell in row)
                 context += f"| {row_str} |\n"
     context = context.strip()
-
+    print(template.format(
+        system_prompt=system_prompt,
+        few_shot_examples=few_shot_block,
+        question=example["question"],
+        context=context,
+        ))
     return template.format(
         system_prompt=system_prompt,
         few_shot_examples=few_shot_block,
         question=example["question"],
         context=context,
-    )
+        )
 
 
 def parse_model_output(output: str) -> tuple:
@@ -212,7 +217,9 @@ def parse_model_output(output: str) -> tuple:
         program = program.replace(' e x p ', ' exp ').replace('e x p', 'exp')
         # Clean up multiple spaces
         program = ' '.join(program.split())
-    
+    print("answer from parse model output")
+    print(answer)
+    print("-----------")
     return program, answer
 
 
@@ -283,7 +290,7 @@ def main():
                         help="Path to ICL config YAML file")
     parser.add_argument("--model_name", type=str, default=None,
                         help="Override model name from config")
-    parser.add_argument("--data_dir", type=str, default="../data/simplified",
+    parser.add_argument("--data_dir", type=str, default="/data/simplified",
                         help="Data directory")
     parser.add_argument("--output_dir", type=str, default="../results/predictions",
                         help="Output directory for predictions")
@@ -364,7 +371,7 @@ def main():
     os.makedirs(args.output_dir, exist_ok=True)
     
     model_name_short = model_name.split("/")[-1]
-    output_filename = f"{model_name_short}_icl_predictions.json"
+    output_filename = f"{model_name_short}_icl_predictions_latest.json"
     output_path = os.path.join(args.output_dir, output_filename)
     
     with open(output_path, 'w') as f:

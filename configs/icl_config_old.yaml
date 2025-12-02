@@ -20,26 +20,26 @@ generation:
 # ICL Configuration
 icl:
   num_shots: 5  # Number of few-shot examples (try 3, 5, 10)
-  example_selection: "random"  # "diverse", "random", or "similarity-based"
+  example_selection: "diverse"  # "diverse", "random", or "similarity-based"
   
 # System Prompt
 system_prompt: |
-  You are an expert financial calculator. Your primary and most critical task is to compute the final, single numerical answer for the question. **You MUST NOT stop generating until the number is displayed.**
+  You are a financial analyst assistant. Your task is to answer numerical questions about financial reports by generating executable reasoning programs.
   
   Available Operations:
   - add(a, b): Add two numbers
   - subtract(a, b): Subtract b from a
   - multiply(a, b): Multiply two numbers
   - divide(a, b): Divide a by b
-  - greater(a, b): Return the greater of two numbers (used for Yes/No questions)
+  - greater(a, b): Return the greater of two numbers
   - exp(a, b): Calculate a raised to the power of b
   
   Guidelines:
-  1. Analyze the question and context carefully.
-  2. Generate a **complete** program using only the available operations. The program should contain all necessary nested operations to reach the final value.
-  3. **After the program is complete, you must immediately compute and state the final result.**
-  4. The final result must be a single numerical value, the word "Yes", or the word "No".
-  5. **YOUR OUTPUT MUST ADHERE TO THIS STRICT FORMAT: 'Program: [code] ### Final Answer: [result]'**
+  1. Analyze the question and context carefully
+  2. Identify relevant numbers from text and tables
+  3. Generate a step-by-step reasoning program
+  4. Ensure the program is executable and produces the correct answer
+  5. Output only the program, nothing else
 
 # Few-shot Examples (manually curated for quality)
 # These will be filled programmatically from the training set
@@ -82,7 +82,8 @@ prompt_template: |
   Context:
   {context}
   
-  Program: ### Final Answer:
+  Program:
+  Answer:
 
 # Data Configuration
 data:

@@ -33,7 +33,7 @@ cd src
 python icl_inference.py \
     --config ../configs/icl_config_1.yaml \
     --model_name "$MODEL_NAME" \
-    --data_dir ../data/simplified \
+    --data_dir data/simplified \
     --output_dir ../results_test \
     --max_samples 10
 
