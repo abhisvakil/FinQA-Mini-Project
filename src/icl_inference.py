@@ -158,6 +158,8 @@ def parse_model_output(output: str) -> tuple:
     Returns:
         (program, answer) tuple
     """
+    import re
+    
     program = ""
     answer = ""
     
@@ -180,13 +182,23 @@ def parse_model_output(output: str) -> tuple:
             # Remove any trailing punctuation that shouldn't be there
             answer = answer.rstrip('.,;:!?')
         else:
-            # Only program, no answer
-            program = program_part.strip()
+            # Only program, no explicit answer - try to extract from next lines
+            program = program_part.split('\n')[0].strip()
     else:
         # Fallback: try to extract from beginning if no Program: marker
         lines = output.strip().split('\n')
         if lines:
             program = lines[0].strip()
+    
+    # If no answer found yet, try to find a number in the output
+    if not answer and output:
+        # Look for standalone numbers (int or float) in the output
+        # Pattern: number that's on its own line or after the program
+        number_pattern = r'(?:^|\n)\s*(-?\d+\.?\d*(?:e[+-]?\d+)?)\s*(?:\n|$)'
+        matches = re.findall(number_pattern, output, re.MULTILINE)
+        if matches:
+            # Take the first number found after the program
+            answer = matches[0]
     
     # Clean up program: remove spaces between characters if present
     # (handles cases where model outputs "s u b t r a c t" instead of "subtract")
