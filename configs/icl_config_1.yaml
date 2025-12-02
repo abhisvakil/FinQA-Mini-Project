@@ -86,7 +86,7 @@ prompt_template: |
 
 # Data Configuration
 data:
-  test_file: "data/test.json"
+  test_file: "src/data/simplified/test_simplified.json"
   output_file: "results/icl_config_1/predictions.json"
   max_samples: null  # For testing, can limit to e.g., 100
 

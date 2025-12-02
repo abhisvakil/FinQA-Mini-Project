@@ -415,10 +415,18 @@ def evaluate_result(json_in, json_ori):
         each_ori_data = data_dict[each_id]
         
         table = each_ori_data.get("table", [])
-        gold_res = each_ori_data["qa"]["exe_ans"]
+        
+        # Handle both nested qa format and flat format
+        if "qa" in each_ori_data:
+            gold_res = each_ori_data["qa"]["exe_ans"]
+            gold_program = each_ori_data["qa"]["program"]
+        else:
+            # Flat format: answer and program at top level
+            gold_res = each_ori_data.get("answer", each_ori_data.get("exe_ans"))
+            gold_program = each_ori_data["program"]
         
         pred = each_data["predicted"]
-        gold = program_tokenization(each_ori_data["qa"]["program"])
+        gold = program_tokenization(gold_program)
 
         invalid_flag, exe_res = eval_program(pred, table)
         
@@ -436,7 +444,11 @@ def evaluate_result(json_in, json_ori):
                 print(each_ori_data["id"])
             prog_correct += 1
 
-        each_ori_data["qa"]["predicted"] = pred
+        # Store prediction - handle both formats
+        if "qa" in each_ori_data:
+            each_ori_data["qa"]["predicted"] = pred
+        else:
+            each_ori_data["predicted"] = pred
 
         if exe_res != gold_res:
             res_list.append(each_ori_data)
@@ -454,9 +466,118 @@ def evaluate_result(json_in, json_ori):
 
 
 
+def detect_and_convert_format(predictions_file):
+    """
+    Detect if predictions are in our format and convert if needed.
+    Our format: {id, question, predicted_program, predicted_answer, gold_program, gold_answer, raw_output}
+    Expected format: {id, predicted: [program tokens]}
+    
+    Returns: (converted_file_path, test_file_path or None)
+    """
+    with open(predictions_file, 'r') as f:
+        data = json.load(f)
+    
+    # Check if first entry has our format
+    if data and 'predicted_program' in data[0]:
+        print("Detected custom prediction format - converting...")
+        
+        converted = []
+        test_data = []
+        
+        for pred in data:
+            # Convert program string to token list
+            program_str = pred['predicted_program']
+            
+            # Split by comma to get individual operations
+            operations = [op.strip() for op in program_str.split(',') if op.strip()]
+            
+            # Tokenize each operation
+            tokens = []
+            for op in operations:
+                # Parse operation like "subtract(5829, 5735)"
+                if '(' in op and ')' in op:
+                    func_name = op.split('(')[0].strip()
+                    args = op.split('(')[1].rstrip(')').strip()
+                    arg_list = [arg.strip() for arg in args.split(',')]
+                    
+                    # Build token list: ["subtract", "(", "5829", "5735", ")"]
+                    tokens.append(func_name)
+                    tokens.append('(')
+                    tokens.extend(arg_list)
+                    tokens.append(')')
+                else:
+                    if op:
+                        tokens.append(op)
+            
+            # Add EOF token
+            tokens.append('EOF')
+            
+            converted.append({
+                'id': pred['id'],
+                'predicted': tokens
+            })
+            
+            # Create test data from gold info
+            test_data.append({
+                'id': pred['id'],
+                'qa': {
+                    'program': pred['gold_program'],
+                    'exe_ans': pred['gold_answer']
+                },
+                'table': []  # Empty table - can't execute without it
+            })
+        
+        # Write converted files
+        converted_file = predictions_file.replace('.json', '_converted.json')
+        test_file = predictions_file.replace('.json', '_test.json')
+        
+        with open(converted_file, 'w') as f:
+            json.dump(converted, f, indent=2)
+        
+        with open(test_file, 'w') as f:
+            json.dump(test_data, f, indent=2)
+        
+        print(f"Converted {len(converted)} predictions")
+        print(f"Created: {converted_file}")
+        print(f"Created: {test_file}")
+        
+        return converted_file, test_file
+    
+    # Already in correct format
+    return predictions_file, None
+
+
 if __name__ == '__main__':
+    
+    if len(sys.argv) < 2:
+        print("Usage: python finqa_evaluate.py <predictions_file> [test_file]")
+        print("Example: python finqa_evaluate.py results/predictions.json data/simplified/test.json")
+        print("\nIf test_file is not provided and predictions are in custom format,")
+        print("a test file will be generated from gold data in predictions.")
+        sys.exit(1)
 
     json_in = sys.argv[1]
-    json_ori = sys.argv[2]
+    json_ori = sys.argv[2] if len(sys.argv) > 2 else None
+    
+    # Detect format and convert if needed
+    json_in, generated_test = detect_and_convert_format(json_in)
+    
+    # Use generated test file if no test file provided
+    if json_ori is None and generated_test:
+        json_ori = generated_test
+    elif json_ori is None:
+        print("Error: No test file provided and could not generate one")
+        print("Provide test file as second argument")
+        sys.exit(1)
+    
+    print("\n" + "="*80)
+    print("Running evaluation...")
+    print("="*80 + "\n")
 
-    evaluate_result(json_in, json_ori)
+    exe_acc, prog_acc = evaluate_result(json_in, json_ori)
+    
+    print("\n" + "="*80)
+    print(f"Final Results:")
+    print(f"  Execution Accuracy: {exe_acc:.4f} ({exe_acc*100:.2f}%)")
+    print(f"  Program Accuracy: {prog_acc:.4f} ({prog_acc*100:.2f}%)")
+    print("="*80)
