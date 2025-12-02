@@ -36,13 +36,11 @@ def convert_predictions_format(predictions, output_file, test_data_dict=None):
                 args = op.split('(')[1].rstrip(')').strip()
                 arg_list = [arg.strip() for arg in args.split(',')]
                 
-                # Build token list: ["subtract", "(", "5829", ",", "5735", ")"]
+                # Build token list: ["subtract", "(", "5829", "5735", ")"]
+                # No commas - just op, (, args..., )
                 tokens.append(func_name)
                 tokens.append('(')
-                for i, arg in enumerate(arg_list):
-                    tokens.append(arg)
-                    if i < len(arg_list) - 1:
-                        tokens.append(',')
+                tokens.extend(arg_list)
                 tokens.append(')')
             else:
                 # Handle cases where it might just be a number or reference
