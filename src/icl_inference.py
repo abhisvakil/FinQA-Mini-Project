@@ -87,6 +87,12 @@ def finqa_to_yaml_examples(selected: List[Dict]) -> List[Dict]:
         
         # Extract program and answer
         program = " ".join(ex['program']) if isinstance(ex.get('program'), list) else ex.get('program', '')
+        
+        # Remove const_ prefixes from program to match desired format
+        import re
+        program = re.sub(r'const_(\d+\.?\d*)', r'\1', program)
+        program = re.sub(r'const_', '', program)
+        
         answer = str(ex.get('answer', ''))
         
         out.append({
@@ -246,6 +252,12 @@ def parse_model_output(output: str) -> tuple:
         program = program.replace(' e x p ', ' exp ').replace('e x p', 'exp')
         # Clean up multiple spaces
         program = ' '.join(program.split())
+    
+    # Remove const_ prefixes from program (model may still output them despite instructions)
+    if program:
+        import re
+        program = re.sub(r'const_(\d+\.?\d*)', r'\1', program)
+        program = re.sub(r'const_', '', program)
     
     return program, answer
 
