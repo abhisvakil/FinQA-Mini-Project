@@ -108,6 +108,8 @@ for i, pred in enumerate(predictions, 1):
     program_match = pred_prog_norm == gold_prog_norm
     
     # Check answer (round to 2 decimals for comparison)
+    pred_rounded = None
+    gold_rounded = None
     try:
         pred_num = float(pred_ans.split()[0]) if pred_ans else None
         gold_num = float(gold_ans)
@@ -144,10 +146,12 @@ for i, pred in enumerate(predictions, 1):
     print(f"   Question: {pred['question'][:70]}...")
     print(f"   Program match: {'✓' if program_match else '✗'}")
     print(f"   Answer match: {'✓' if answer_match else '✗'}")
+    if pred_rounded is not None and gold_rounded is not None:
+        print(f"   Pred: {pred_ans} → {pred_rounded} | Gold: {gold_ans} → {gold_rounded}")
     if not program_match:
         print(f"   Predicted: {pred_prog}")
         print(f"   Gold:      {gold_prog}")
-    if not answer_match:
+    if not answer_match and (pred_rounded is None or gold_rounded is None):
         print(f"   Pred answer: {pred_ans}")
         print(f"   Gold answer: {gold_ans}")
 
