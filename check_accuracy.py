@@ -88,6 +88,7 @@ for i, pred in enumerate(predictions, 1):
         print(f"   Gold answer: {gold_ans}")
 
 print("\n" + "=" * 80)
-print(f"Results: {correct_programs}/10 correct programs ({correct_programs*10}%)")
-print(f"         {correct_answers}/10 correct answers ({correct_answers*10}%)")
+total = len(predictions)
+print(f"Results: {correct_programs}/{total} correct programs ({correct_programs*100//total}%)")
+print(f"         {correct_answers}/{total} correct answers ({correct_answers*100//total}%)")
 print("=" * 80)
