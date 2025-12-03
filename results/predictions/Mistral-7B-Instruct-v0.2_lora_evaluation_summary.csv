@@ -1,0 +1,5 @@
+Model,Mistral-7B-Instruct-v0.2
+Metric,Count,Accuracy (%)
+Total Predictions,1147,
+Program Correct,309,26.94
+Answer Correct,285,24.85
