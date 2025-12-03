@@ -1,7 +1,4 @@
 timestamp,model_name,config_name,num_shots,program_accuracy,answer_accuracy,total_samples
 2025-12-03 03:43:01,Mistral-7B-Instruct-v0.2,config_2,5,14.0,12.0,50
-<<<<<<< Updated upstream
 2025-12-03 07:24:08,Mistral-7B-Instruct-v0.2,config_1,3,8.6,15.6,500
-=======
 2025-12-03 07:29:05,Mistral-7B-Instruct-v0.2,config_1,0,0.2,3.6,500
->>>>>>> Stashed changes
