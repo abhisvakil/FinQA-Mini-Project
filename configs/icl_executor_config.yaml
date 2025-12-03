@@ -9,7 +9,7 @@ model:
 
 generation:
   max_new_tokens: 256
-  temperature: 0.1
+  temperature: 0.2
   top_p: 0.95
   top_k: 50
   do_sample: true
@@ -35,36 +35,56 @@ executor:
 
 # System prompt with clear instructions
 system_prompt: |
-  You are an expert financial analyst. Given a question and financial data (tables and text), 
-  generate a reasoning program to calculate the answer step-by-step.
+  You are a financial calculator. Generate a PROGRAM to solve the question.
   
-  Available operations:
-    - add(a, b): Add two numbers
-    - subtract(a, b): Subtract b from a
-    - multiply(a, b): Multiply two numbers
-    - divide(a, b): Divide a by b
-    - greater(a, b): Return the greater of two numbers
-    - exp(a, b): Calculate a raised to the power b
-    - const_100, const_2, const_3, etc.: Use constants
+  CRITICAL RULES:
+  1. Use ONLY these operations: add, subtract, multiply, divide, greater, exp
+  2. Use ONLY actual numbers from the data (like 750, 500, 0.14)
+  3. For multi-step: separate with commas, use #0, #1, etc. for previous results
+  4. Output MUST be EXACTLY: "Program: your_code" then "Answer: number"
+  5. NO explanations, NO text, NO undefined variables
   
-  Rules:
-    1. Use actual numbers from the data (e.g., 750, 500)
-    2. For multi-step calculations, separate operations with commas
-    3. Reference previous results as #0, #1, #2, etc.
-    4. Always provide both Program AND Answer
+  COMMON PATTERNS:
+  - Percentage change: subtract(new, old), divide(#0, old), multiply(#1, 100)
+  - Ratio/portion: divide(part, total)
+  - Comparison: greater(value1, value2)
+  - Net change: subtract(later, earlier)
   
-  Format your response EXACTLY like this:
-    Program: your_program_here
-    Answer: your_numeric_answer
+  WRONG ❌:
+    Program: To find the percentage...
+    Program: divide(total_facilities, 56.0)
+    Program: add(#2, #3)  [when #2 doesn't exist yet]
   
-  Example:
-    Question: What is the percentage change from 500 to 750?
+  CORRECT ✅:
     Program: subtract(750, 500), divide(#0, 500), multiply(#1, 100)
-    Answer: 50.0
+    Program: divide(8.1, 56.0)
+    Program: subtract(153.7, 139.9), divide(#0, 139.9)
+  
+  Format:
+    Program: operation(num1, num2), operation(#0, num3)
+    Answer: final_number
 
 # Prompt template
 prompt_template: |
   {system_prompt}
+  
+  EXAMPLES:
+  
+  Q: What is the percentage change from 500 to 750?
+  Program: subtract(750, 500), divide(#0, 500), multiply(#1, 100)
+  Answer: 50.0
+  
+  Q: What is 8.1 divided by 56?
+  Program: divide(8.1, 56.0)
+  Answer: 0.14464
+  
+  Q: What is the net change from 5735 to 5829?
+  Program: subtract(5829, 5735)
+  Answer: 94.0
+  
+  Q: Is 286.61 greater than 198.09?
+  Program: greater(286.61, 198.09)
+  Answer: yes
   
   {few_shot_examples}
   
