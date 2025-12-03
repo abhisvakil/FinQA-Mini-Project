@@ -24,6 +24,9 @@ MISTRAL_MODEL="mistralai/Mistral-7B-Instruct-v0.2"
 # Sampling (set to limit test samples, or leave empty for all)
 NUM_SAMPLES=""  # e.g., "100" for quick testing, or "" for all samples
 
+# Test file (use test_500.json for 500 samples, or test_simplified.json for all)
+TEST_FILE="test_500.json"  # or "test_simplified.json" for full dataset
+
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}       FinQA PEFT vs ICL - Complete Pipeline${NC}"
 echo -e "${BLUE}============================================================${NC}\n"
@@ -206,6 +209,8 @@ function infer_icl_mistral() {
         --data_dir "../$DATA_DIR" \
         --output_dir "../$PRED_DIR" \
         --num_shots "$num_shots" \
+        --test_file "$TEST_FILE" \
+        ${NUM_SAMPLES:+--max_samples $NUM_SAMPLES}
         ${NUM_SAMPLES:+--max_samples $NUM_SAMPLES}
     cd ..
     echo -e "${YELLOW}✓ ICL Mistral inference complete${NC}\n"

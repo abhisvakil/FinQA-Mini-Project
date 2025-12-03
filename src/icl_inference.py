@@ -353,6 +353,8 @@ def main():
                         help="Override temperature from config")
     parser.add_argument("--num_shots", type=int, default=5,
                         help="Number of few-shot examples (e.g., 0, 3, 5, 10)")
+    parser.add_argument("--test_file", type=str, default="test_500.json",
+                        help="Test file name (e.g., test_simplified.json, test_500.json)")
     
     args = parser.parse_args()
     
@@ -399,7 +401,7 @@ def main():
     # Load data
     print("\n[2/5] Loading data...", flush=True)
     train_path = os.path.join(args.data_dir, "train_simplified.json")
-    test_path = os.path.join(args.data_dir, "test_simplified.json")
+    test_path = os.path.join(args.data_dir, args.test_file)
     
     with open(train_path, 'r') as f:
         train_data = json.load(f)
