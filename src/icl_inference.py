@@ -413,11 +413,21 @@ def main():
     
     # Save predictions
     print("\n[5/5] Saving predictions...")
-    os.makedirs(args.output_dir, exist_ok=True)
+    
+    # Determine output directory based on config file name
+    config_basename = os.path.basename(args.config)
+    if "config_1" in config_basename or "config1" in config_basename:
+        output_dir = "../results/icl_config_1"
+    elif "config_2" in config_basename or "config2" in config_basename:
+        output_dir = "../results/icl_config_2"
+    else:
+        output_dir = args.output_dir
+    
+    os.makedirs(output_dir, exist_ok=True)
     
     model_name_short = model_name.split("/")[-1]
     output_filename = f"{model_name_short}_icl_predictions_latest.json"
-    output_path = os.path.join(args.output_dir, output_filename)
+    output_path = os.path.join(output_dir, output_filename)
     
     with open(output_path, 'w') as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
