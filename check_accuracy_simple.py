@@ -193,6 +193,9 @@ def equal_program(program1, program2):
         
     except Exception as e:
         # If any error in symbolic comparison, fall back to False
+        # Debug: Uncomment below to see errors
+        print(f"ERROR in equal_program: {e}")
+        import traceback; traceback.print_exc()
         return False
 
 # Load predictions from file
