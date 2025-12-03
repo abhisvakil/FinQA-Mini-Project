@@ -10,7 +10,7 @@ model:
 # Generation Parameters
 generation:
   max_new_tokens: 256
-  temperature: 0.1  # Low temperature for deterministic output
+  temperature: 0.2  # Slightly higher for better diversity
   top_p: 0.95
   top_k: 50
   do_sample: true

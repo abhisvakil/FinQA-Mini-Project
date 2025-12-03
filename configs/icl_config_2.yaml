@@ -8,7 +8,7 @@ model:
 
 generation:
   max_new_tokens: 512
-  temperature: 0.1
+  temperature: 0.2
   top_p: 0.95
   top_k: 50
   do_sample: true

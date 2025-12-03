@@ -26,7 +26,7 @@ echo -e "${BLUE}       FinQA PEFT vs ICL - Complete Pipeline${NC}"
 echo -e "${BLUE}============================================================${NC}\n"
 
 function show_usage() {
-    echo "Usage: ./run_all_experiments.sh [command]"
+    echo "Usage: ./run_all_experiments.sh [command] [options]"
     echo ""
     echo "Training Commands:"
     echo "  train-lora-llama      - Train LoRA on Llama"
@@ -40,9 +40,13 @@ function show_usage() {
     echo "  infer-lora-mistral    - Inference with LoRA Mistral"
     echo "  infer-qlora-llama     - Inference with QLoRA Llama"
     echo "  infer-qlora-mistral   - Inference with QLoRA Mistral"
-    echo "  infer-icl-llama       - ICL inference with Llama"
-    echo "  infer-icl-mistral     - ICL inference with Mistral"
+    echo "  infer-icl-llama [config]       - ICL inference with Llama (default: config_1)"
+    echo "  infer-icl-mistral [config]     - ICL inference with Mistral (default: config_2)"
     echo "  infer-all             - All inference (6 total)"
+    echo ""
+    echo "Examples:"
+    echo "  ./run_all_experiments.sh infer-icl-mistral config_2"
+    echo "  ./run_all_experiments.sh infer-icl-llama config_1"
     echo ""
     echo "Full Pipeline:"
     echo "  full                  - Train all + Infer all"
@@ -172,10 +176,11 @@ function infer_qlora_mistral() {
 }
 
 function infer_icl_llama() {
-    echo -e "${YELLOW}[INFER] ICL Llama...${NC}"
+    local config="${1:-config_1}"  # Default to config_1 if not specified
+    echo -e "${YELLOW}[INFER] ICL Llama with ${config}...${NC}"
     cd src
     python icl_inference.py \
-        --config ../configs/icl_config.yaml \
+        --config ../configs/icl_${config}.yaml \
         --model_name "$LLAMA_MODEL" \
         --data_dir "../$DATA_DIR" \
         --output_dir "../$PRED_DIR"
@@ -184,10 +189,11 @@ function infer_icl_llama() {
 }
 
 function infer_icl_mistral() {
-    echo -e "${YELLOW}[INFER] ICL Mistral...${NC}"
+    local config="${1:-config_2}"  # Default to config_2 if not specified
+    echo -e "${YELLOW}[INFER] ICL Mistral with ${config}...${NC}"
     cd src
     python icl_inference.py \
-        --config ../configs/icl_config.yaml \
+        --config ../configs/icl_${config}.yaml \
         --model_name "$MISTRAL_MODEL" \
         --data_dir "../$DATA_DIR" \
         --output_dir "../$PRED_DIR"
@@ -210,13 +216,13 @@ case "$1" in
         train_qlora_llama
         train_qlora_mistral
         echo -e "${GREEN}✓✓✓ All training complete!${NC}"
-        ;;
-    
     # Inference
     infer-lora-llama) infer_lora_llama ;;
     infer-lora-mistral) infer_lora_mistral ;;
     infer-qlora-llama) infer_qlora_llama ;;
     infer-qlora-mistral) infer_qlora_mistral ;;
+    infer-icl-llama) infer_icl_llama "$2" ;;
+    infer-icl-mistral) infer_icl_mistral "$2" ;;l ;;
     infer-icl-llama) infer_icl_llama ;;
     infer-icl-mistral) infer_icl_mistral ;;
     
