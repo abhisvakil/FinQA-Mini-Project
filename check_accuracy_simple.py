@@ -11,11 +11,19 @@ all_ops = ["add", "subtract", "multiply", "divide", "exp", "greater", "table_max
 
 def program_tokenization(original_program):
     """Convert program string to token list"""
-    original_program = original_program.split(', ')
+    # Split on ", " only between operations (not within parentheses)
+    # Simple approach: split on "), " to separate steps
+    if '), ' in original_program:
+        steps = original_program.split('), ')
+        # Add back the closing paren except for last step
+        steps = [s + ')' if i < len(steps) - 1 else s for i, s in enumerate(steps)]
+    else:
+        steps = [original_program]
+    
     program = []
-    for tok in original_program:
+    for step in steps:
         cur_tok = ''
-        for c in tok:
+        for c in step:
             if c == ')':
                 if cur_tok != '':
                     program.append(cur_tok)
@@ -27,6 +35,10 @@ def program_tokenization(original_program):
                     cur_tok = ''
                 program.append(c)
             elif c == ' ':
+                if cur_tok != '':
+                    program.append(cur_tok)
+                    cur_tok = ''
+            elif c == ',':
                 if cur_tok != '':
                     program.append(cur_tok)
                     cur_tok = ''
