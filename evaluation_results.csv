@@ -1,0 +1,2 @@
+timestamp,model_name,config_name,num_shots,program_accuracy,answer_accuracy,total_samples
+2025-12-03 03:43:01,Mistral-7B-Instruct-v0.2,config_2,5,14.0,12.0,50

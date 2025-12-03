@@ -34,7 +34,7 @@ echo -e "${GREEN}========================================${NC}\n"
 # Run inference with specified number of samples
 cd src
 python icl_inference.py \
-    --config ../configs/icl_config_1.yaml \
+    --config ../configs/icl_config_2.yaml \
     --model_name "$MODEL_NAME" \
     --data_dir data/simplified \
     --output_dir ../results_test \
