@@ -179,7 +179,8 @@ function infer_icl_llama() {
     local config="${1:-config_1}"  # Default to config_1 if not specified
     echo -e "${YELLOW}[INFER] ICL Llama with ${config}...${NC}"
     cd src
-    python icl_inference.py \
+    # Use stdbuf to unbuffer output for nohup
+    stdbuf -oL -eL python -u icl_inference.py \
         --config ../configs/icl_${config}.yaml \
         --model_name "$LLAMA_MODEL" \
         --data_dir "../$DATA_DIR" \
@@ -192,7 +193,8 @@ function infer_icl_mistral() {
     local config="${1:-config_2}"  # Default to config_2 if not specified
     echo -e "${YELLOW}[INFER] ICL Mistral with ${config}...${NC}"
     cd src
-    python icl_inference.py \
+    # Use stdbuf to unbuffer output for nohup
+    stdbuf -oL -eL python -u icl_inference.py \
         --config ../configs/icl_${config}.yaml \
         --model_name "$MISTRAL_MODEL" \
         --data_dir "../$DATA_DIR" \

@@ -14,6 +14,9 @@ from typing import List, Dict
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from tqdm import tqdm
 
+# Configure tqdm for nohup and terminal output
+tqdm.monitor_interval = 0
+
 # Add parent directory to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -272,7 +275,17 @@ def run_inference(model, tokenizer, test_data: List[Dict], config: dict) -> List
     gen_config = config['generation']
     predictions = []
     
-    for example in tqdm(test_data, desc="Running ICL inference"):
+    # Configure progress bar for nohup compatibility
+    pbar = tqdm(
+        test_data, 
+        desc="Running ICL inference",
+        ncols=100,
+        bar_format='{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}, {rate_fmt}]',
+        file=sys.stdout,
+        dynamic_ncols=False
+    )
+    
+    for example in pbar:
         # Create prompt using config template
         prompt = create_prompt_from_config(config, example)
         
@@ -358,7 +371,7 @@ def main():
     print("=" * 80)
     
     # Load model and tokenizer
-    print("\n[1/5] Loading model and tokenizer...")
+    print("\n[1/5] Loading model and tokenizer...", flush=True)
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
@@ -371,10 +384,10 @@ def main():
         trust_remote_code=True
     )
     model.eval()
-    print(f"  Model loaded on device: {model.device}")
+    print(f"  Model loaded on device: {model.device}", flush=True)
     
     # Load data
-    print("\n[2/5] Loading data...")
+    print("\n[2/5] Loading data...", flush=True)
     train_path = os.path.join(args.data_dir, "train_simplified.json")
     test_path = os.path.join(args.data_dir, "test_simplified.json")
     
@@ -386,11 +399,11 @@ def main():
     if args.max_samples:
         test_data = test_data[:args.max_samples]
     
-    print(f"  Train examples: {len(train_data)}")
-    print(f"  Test examples: {len(test_data)}")
+    print(f"  Train examples: {len(train_data)}", flush=True)
+    print(f"  Test examples: {len(test_data)}", flush=True)
     
     # Select and format few-shot examples
-    print(f"\n[3/5] Selecting and formatting few-shot examples...")
+    print(f"\n[3/5] Selecting and formatting few-shot examples...", flush=True)
     num_shots = config['icl']['num_shots']
     selection_method = config['icl'].get('example_selection', 'diverse')
     few_shot_examples = select_few_shot_examples(train_data, num_shots, selection_method)
@@ -399,14 +412,15 @@ def main():
     config['few_shot_examples'] = finqa_to_yaml_examples(few_shot_examples)
     
     for i, ex in enumerate(config['few_shot_examples'], 1):
-        print(f"  Example {i}: {ex['question'][:60]}...")
+        print(f"  Example {i}: {ex['question'][:60]}...", flush=True)
     
     # Run inference
-    print("\n[4/5] Running inference...")
+    print("\n[4/5] Running inference...", flush=True)
+    sys.stdout.flush()  # Extra flush before progress bar starts
     predictions = run_inference(model, tokenizer, test_data, config)
     
     # Save predictions
-    print("\n[5/5] Saving predictions...")
+    print("\n[5/5] Saving predictions...", flush=True)
     
     # Determine output directory based on config file name
     config_basename = os.path.basename(args.config)
@@ -426,7 +440,7 @@ def main():
     with open(output_path, 'w') as f:
         json.dump(predictions, f, indent=2, ensure_ascii=False)
     
-    print(f"  Saved to: {output_path}")
+    print(f"  Saved to: {output_path}", flush=True)
     
     # Quick preview
     print("\n" + "=" * 80)
