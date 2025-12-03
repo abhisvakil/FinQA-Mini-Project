@@ -6,6 +6,21 @@ Evaluate predictions from ICL with Executor.
 import json
 import sys
 import csv
+from sympy import simplify
+
+
+all_ops = [
+    "add",
+    "subtract",
+    "multiply",
+    "divide",
+    "exp",
+    "greater",
+    "table_max",
+    "table_min",
+    "table_sum",
+    "table_average",
+]
 
 
 def normalize_program(program_str):
@@ -13,6 +28,229 @@ def normalize_program(program_str):
     if not program_str:
         return ""
     return ''.join(program_str.split())
+
+
+def program_tokenization(original_program):
+    """Convert program string to token list (FinQA-style)."""
+    original_program = original_program.split(', ')
+    program = []
+    for tok in original_program:
+        cur_tok = ''
+        for c in tok:
+            if c == ')':
+                if cur_tok != '':
+                    program.append(cur_tok)
+                    cur_tok = ''
+                program.append(c)
+            elif c == '(':
+                if cur_tok != '':
+                    program.append(cur_tok)
+                    cur_tok = ''
+                program.append(c)
+            elif c == ' ':
+                if cur_tok != '':
+                    program.append(cur_tok)
+                    cur_tok = ''
+            else:
+                cur_tok += c
+        if cur_tok != '':
+            program.append(cur_tok)
+    program.append('EOF')
+    return program
+
+
+def equal_program(program_gold: str, program_pred: str) -> bool:
+    """
+    Symbolically compare two programs for equivalence.
+    This mirrors the logic in check_accuracy_simple.py.
+    """
+    program_gold = (program_gold or "").strip()
+    program_pred = (program_pred or "").strip()
+
+    # Quick exact match
+    if program_gold == program_pred:
+        return True
+
+    # Empty or obviously bad predicted program
+    if not program_pred:
+        return False
+
+    try:
+        # Tokenize both programs
+        prog1_tokens = program_tokenization(program_gold)
+        prog2_tokens = program_tokenization(program_pred)
+
+        sym_map = {}
+
+        # Build symbolic map from gold program
+        prog1_tokens = prog1_tokens[:-1]  # remove EOF
+        program1_str = "|".join(prog1_tokens)
+        steps1 = program1_str.split(")")[:-1]
+
+        sym_ind = 0
+        step_dict_1 = {}
+
+        for ind, step in enumerate(steps1):
+            step = step.strip()
+            if len(step.split("(")) > 2:
+                return False
+
+            op = step.split("(")[0].strip("|").strip()
+            args = step.split("(")[1].strip("|").strip()
+
+            arg1 = args.split("|")[0].strip()
+            arg2 = args.split("|")[1].strip()
+
+            step_dict_1[ind] = step
+
+            if "table" in op:
+                if step not in sym_map:
+                    sym_map[step] = "a" + str(sym_ind)
+                    sym_ind += 1
+            else:
+                if "#" not in arg1:
+                    if arg1 not in sym_map:
+                        sym_map[arg1] = "a" + str(sym_ind)
+                        sym_ind += 1
+                if "#" not in arg2:
+                    if arg2 not in sym_map:
+                        sym_map[arg2] = "a" + str(sym_ind)
+                        sym_ind += 1
+
+        # Check predicted program structure
+        step_dict_2 = {}
+        prog2_tokens = prog2_tokens[:-1]  # remove EOF
+
+        # Validate structure: op ( arg1 arg2 )
+        for ind, token in enumerate(prog2_tokens):
+            if ind % 4 == 0:
+                if token.strip("(") not in all_ops:
+                    return False
+            if (ind + 1) % 4 == 0:
+                if token != ")":
+                    return False
+
+        program2_str = "|".join(prog2_tokens)
+        steps2 = program2_str.split(")")[:-1]
+
+        for ind, step in enumerate(steps2):
+            step = step.strip()
+            if len(step.split("(")) > 2:
+                return False
+
+            op = step.split("(")[0].strip("|").strip()
+            args = step.split("(")[1].strip("|").strip()
+
+            arg1 = args.split("|")[0].strip()
+            arg2 = args.split("|")[1].strip()
+
+            step_dict_2[ind] = step
+
+            if "table" in op:
+                if step not in sym_map:
+                    return False
+            else:
+                if "#" not in arg1:
+                    if arg1 not in sym_map:
+                        return False
+                else:
+                    if int(arg1.strip("#")) >= ind:
+                        return False
+
+                if "#" not in arg2:
+                    if arg2 not in sym_map:
+                        return False
+                else:
+                    if int(arg2.strip("#")) >= ind:
+                        return False
+
+        def symbol_recur(step, step_dict):
+            step = step.strip()
+            op = step.split("(")[0].strip("|").strip()
+            args = step.split("(")[1].strip("|").strip()
+
+            arg1 = args.split("|")[0].strip()
+            arg2 = args.split("|")[1].strip()
+
+            if "table" in op:
+                return sym_map[step]
+
+            if "#" in arg1:
+                arg1_ind = int(arg1.replace("#", ""))
+                arg1_part = symbol_recur(step_dict[arg1_ind], step_dict)
+            else:
+                arg1_part = sym_map[arg1]
+
+            if "#" in arg2:
+                arg2_ind = int(arg2.replace("#", ""))
+                arg2_part = symbol_recur(step_dict[arg2_ind], step_dict)
+            else:
+                arg2_part = sym_map[arg2]
+
+            if op == "add":
+                return f"( {arg1_part} + {arg2_part} )"
+            elif op == "subtract":
+                return f"( {arg1_part} - {arg2_part} )"
+            elif op == "multiply":
+                return f"( {arg1_part} * {arg2_part} )"
+            elif op == "divide":
+                return f"( {arg1_part} / {arg2_part} )"
+            elif op == "exp":
+                return f"( {arg1_part} ** {arg2_part} )"
+            elif op == "greater":
+                return f"( {arg1_part} > {arg2_part} )"
+            elif op == "less":
+                return f"( {arg1_part} < {arg2_part} )"
+            return ""
+
+        sym_prog1 = symbol_recur(steps1[-1], step_dict_1)
+        sym_prog2 = symbol_recur(steps2[-1], step_dict_2)
+
+        # For boolean operations, compare strings directly
+        if any(tok in sym_prog1 for tok in [">", "<"]) or any(
+            tok in sym_prog2 for tok in [">", "<"]
+        ):
+            return sym_prog1 == sym_prog2
+
+        # For arithmetic, compare via sympy
+        sym_prog1_s = simplify(sym_prog1, evaluate=False)
+        sym_prog2_s = simplify(sym_prog2, evaluate=False)
+        return sym_prog1_s == sym_prog2_s
+
+    except Exception:
+        # If anything goes wrong, fall back to False
+        return False
+
+
+def compare_answers(pred_ans: str, gold_ans: str) -> bool:
+    """
+    Compare answers using the same tolerance as check_accuracy_simple.py:
+    - numeric: compare floats rounded to 2 decimals
+    - non-numeric: relaxed boolean/string matching
+    """
+    pred_ans = (pred_ans or "").strip()
+    gold_ans = (gold_ans or "").strip()
+
+    try:
+        pred_num = float(pred_ans.split()[0]) if pred_ans else None
+        gold_num = float(gold_ans)
+        if pred_num is not None:
+            return round(pred_num, 2) == round(gold_num, 2)
+        return False
+    except (ValueError, AttributeError):
+        pred_lower = pred_ans.lower()
+        gold_lower = gold_ans.lower()
+
+        true_values = ['true', 'yes', '1']
+        false_values = ['false', 'no', '0']
+
+        if pred_lower in true_values and gold_lower in true_values:
+            return True
+        if pred_lower in false_values and gold_lower in false_values:
+            return True
+
+        # Fallback: substring match
+        return pred_lower in gold_lower or gold_lower in pred_lower
 
 
 def safe_float(value, decimals=2):
@@ -54,19 +292,27 @@ def evaluate_executor_predictions(predictions_file, output_csv=None):
     print("="*70)
     
     for i, pred in enumerate(predictions, 1):
-        pred_prog = normalize_program(pred.get('predicted_program', ''))
-        gold_prog = normalize_program(pred.get('gold_program', ''))
+        # Use raw programs for symbolic comparison (no space stripping)
+        pred_prog_raw = pred.get('predicted_program', '')
+        gold_prog_raw = pred.get('gold_program', '')
         
-        # Use executor answer if available and successful
+        # Normalized versions (kept for potential debugging / CSV)
+        pred_prog = normalize_program(pred_prog_raw)
+        gold_prog = normalize_program(gold_prog_raw)
+        
+        # Use executor answer if available and successful (raw strings)
         if pred.get('executor_success') and pred.get('executor_answer'):
-            pred_ans = safe_float(pred['executor_answer'])
+            pred_ans_raw = str(pred['executor_answer'])
         else:
-            pred_ans = safe_float(pred.get('predicted_answer', ''))
+            pred_ans_raw = str(pred.get('predicted_answer', ''))
         
-        gold_ans = safe_float(pred.get('gold_answer', ''))
+        gold_ans_raw = str(pred.get('gold_answer', ''))
         
-        prog_match = (pred_prog == gold_prog)
-        ans_match = (pred_ans is not None and gold_ans is not None and pred_ans == gold_ans)
+        # Program match via symbolic comparison
+        prog_match = equal_program(gold_prog_raw, pred_prog_raw)
+
+        # Answer match using tolerant comparison
+        ans_match = compare_answers(pred_ans_raw, gold_ans_raw)
         
         if prog_match:
             program_correct += 1
