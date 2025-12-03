@@ -374,7 +374,7 @@ def main():
     
     model_name = config['model']['model_name_or_path']
     print(f"Model: {model_name}")
-    print(f"Few-shot examples: {config['icl']['num_shots']}")
+    print(f"Few-shot examples: {args.num_shots}")
     print(f"Temperature: {config['generation']['temperature']}")
     print(f"Output: {args.output_dir}")
     print("=" * 80)
