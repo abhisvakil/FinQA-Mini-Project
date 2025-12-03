@@ -144,12 +144,6 @@ def create_prompt_from_config(config: dict, example: dict) -> str:
                 row_str = " | ".join(str(cell) for cell in row)
                 context += f"| {row_str} |\n"
     context = context.strip()
-    print(template.format(
-        system_prompt=system_prompt,
-        few_shot_examples=few_shot_block,
-        question=example["question"],
-        context=context,
-        ))
     return template.format(
         system_prompt=system_prompt,
         few_shot_examples=few_shot_block,
