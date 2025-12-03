@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ETR/2016/page_23.pdf-2",
+    "qa": {
+      "program": "subtract(5829, 5735)",
+      "exe_ans": "94.0"
+    },
+    "table": []
+  },
+  {
+    "id": "INTC/2015/page_41.pdf-4",
+    "qa": {
+      "program": "divide(8.1, 56.0)",
+      "exe_ans": "0.14464"
+    },
+    "table": []
+  },
+  {
+    "id": "ADI/2011/page_61.pdf-2",
+    "qa": {
+      "program": "subtract(153.7, 139.9), divide(#0, 139.9)",
+      "exe_ans": "0.09864"
+    },
+    "table": []
+  },
+  {
+    "id": "FIS/2010/page_70.pdf-2",
+    "qa": {
+      "program": "divide(121.4, 4187.8)",
+      "exe_ans": "0.02899"
+    },
+    "table": []
+  },
+  {
+    "id": "MAS/2017/page_27.pdf-2",
+    "qa": {
+      "program": "subtract(318.46, const_100), divide(#0, const_100), subtract(206.49, const_100), divide(#2, const_100), subtract(#1, #3)",
+      "exe_ans": "1.1197"
+    },
+    "table": []
+  },
+  {
+    "id": "SYY/2006/page_71.pdf-1",
+    "qa": {
+      "program": "subtract(92710000, 86842000), divide(#0, 86842000)",
+      "exe_ans": "0.06757"
+    },
+    "table": []
+  },
+  {
+    "id": "AES/2010/page_227.pdf-3",
+    "qa": {
+      "program": "divide(463, 4612)",
+      "exe_ans": "0.10039"
+    },
+    "table": []
+  },
+  {
+    "id": "GS/2015/page_188.pdf-2",
+    "qa": {
+      "program": "divide(301, 2575)",
+      "exe_ans": "0.11689"
+    },
+    "table": []
+  },
+  {
+    "id": "MO/2016/page_19.pdf-1",
+    "qa": {
+      "program": "greater(286.61, 198.09)",
+      "exe_ans": "yes"
+    },
+    "table": []
+  },
+  {
+    "id": "CMCSA/2015/page_112.pdf-2",
+    "qa": {
+      "program": "subtract(1136, 1171)",
+      "exe_ans": "-35.0"
+    },
+    "table": []
+  }
+]

@@ -1,0 +1,489 @@
+[
+  {
+    "id": "ETR/2016/page_23.pdf-2",
+    "predicted": [
+      "add(5829",
+      "#0)",
+      "subtract(5735",
+      "#1)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "INTC/2015/page_41.pdf-4",
+    "predicted": [
+      "divide(add(2.1",
+      "6.0)",
+      "add(30.7",
+      "17.2))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ADI/2011/page_61.pdf-2",
+    "predicted": [
+      "subtract(20692",
+      "4614)",
+      "divide(#0",
+      "4614)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "FIS/2010/page_70.pdf-2",
+    "predicted": [
+      "subtract(121.4",
+      "4066.4)",
+      "divide(#0",
+      "4187.8)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MAS/2017/page_27.pdf-2",
+    "predicted": [
+      "subtract(divide(masco[2017]",
+      "masco[2012])",
+      "divide(s_and_p_500_index[2017]",
+      "s_and_p_500_index[2012]))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "SYY/2006/page_71.pdf-1",
+    "predicted": [
+      "subtract(100690000",
+      "86842000)",
+      "divide(#0",
+      "86842000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "AES/2010/page_227.pdf-3",
+    "predicted": [
+      "divide(1497",
+      "4612)",
+      "multiply(#0",
+      "100.0)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GS/2015/page_188.pdf-2",
+    "predicted": [
+      "divide(sum(2016",
+      "2017",
+      "2018)",
+      "sum(2016",
+      "2017",
+      "2018",
+      "2019",
+      "2020",
+      "2021)) * 100.0",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MO/2016/page_19.pdf-1",
+    "predicted": [
+      "greater(286.61",
+      "198.09)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "CMCSA/2015/page_112.pdf-2",
+    "predicted": [
+      "subtract(1171",
+      "1136)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "STT/2007/page_111.pdf-3",
+    "predicted": [
+      "subtract(4926",
+      "4711)",
+      "divide(#0",
+      "4711)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "UAA/2016/page_42.pdf-2",
+    "predicted": [
+      "divide(subtract(totalassets",
+      "totaldebtincludingcurrentmaturities)",
+      "totalassets)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GIS/2018/page_110.pdf-2",
+    "predicted": [
+      "subtract(137.4",
+      "91.2)",
+      "divide(#0",
+      "46.2)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "JKHY/2019/page_18.pdf-3",
+    "predicted": [
+      "greater(281.09",
+      "286.22)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "AWK/2014/page_121.pdf-2",
+    "predicted": [
+      "subtract(195237",
+      "177947)",
+      "divide(#0",
+      "177947)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MRO/2011/page_108.pdf-1",
+    "predicted": [
+      "subtract(13928",
+      "9280)",
+      "divide(#0",
+      "4000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "RCL/2012/page_75.pdf-1",
+    "predicted": [
+      "EOF"
+    ]
+  },
+  {
+    "id": "ETR/2017/page_372.pdf-1",
+    "predicted": [
+      "subtract(705.4",
+      "18.2)",
+      "add(#0",
+      "13.5)",
+      "add(#1",
+      "2.4)",
+      "divide(add(705.4",
+      "18.2)",
+      "2)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ADBE/2008/page_89.pdf-3",
+    "predicted": [
+      "divide(15300000",
+      "139549000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "JPM/2010/page_273.pdf-2",
+    "predicted": [
+      "subtract(divide(8291",
+      "1000)",
+      "dividesubtract(16067",
+      "6263))",
+      "multiply(#0",
+      "1000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "PNC/2012/page_68.pdf-2",
+    "predicted": [
+      "subtract(843",
+      "772)",
+      "divide(#0",
+      "843)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "FIS/2016/page_31.pdf-2",
+    "predicted": [
+      "subtract(divide(248.68",
+      "100.00)",
+      "divide(198.18",
+      "100.00))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "AMT/2016/page_49.pdf-1",
+    "predicted": [
+      "subtract(101.88",
+      "83.07)",
+      "divide(#0",
+      "83.07)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MAR/2018/page_43.pdf-2",
+    "predicted": [
+      "divide(230",
+      "13208)*100.0",
+      "EOF"
+    ]
+  },
+  {
+    "id": "AAL/2016/page_8.pdf-4",
+    "predicted": [
+      "divide(26900",
+      "16900)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ETFC/2007/page_18.pdf-1",
+    "predicted": [
+      "divide(219000",
+      "83000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GPN/2010/page_87.pdf-3",
+    "predicted": [
+      "divide(subtract(18.1",
+      "6.3)",
+      "18.1)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ADBE/2008/page_89.pdf-2",
+    "predicted": [
+      "subtract(139549",
+      "201808)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "DG/2005/page_44.pdf-2",
+    "predicted": [
+      "add(divide(4.7",
+      "1000000)",
+      "add(divide(0.6",
+      "1000000)",
+      "add(divide(0.6",
+      "1000000)",
+      "divide(0.2",
+      "1000000))))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ALXN/2016/page_153.pdf-2",
+    "predicted": [
+      "divide(175",
+      "sum(2014",
+      "150",
+      "175",
+      "2756))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "UNP/2015/page_56.pdf-1",
+    "predicted": [
+      "divide(3581",
+      "21813)",
+      "multiply(#0",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "C/2009/page_45.pdf-1",
+    "predicted": [
+      "divide(subtract(3173",
+      "896)",
+      "3173)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "AAPL/2006/page_100.pdf-3",
+    "predicted": [
+      "EOF"
+    ]
+  },
+  {
+    "id": "JPM/2018/page_90.pdf-1",
+    "predicted": [
+      "divide(subtract(2229188",
+      "609635)",
+      "1619553)",
+      "multiply(#0",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "PNC/2012/page_65.pdf-4",
+    "predicted": [
+      "subtract(51052",
+      "367)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ABMD/2008/page_86.pdf-1",
+    "predicted": [
+      "subtract(224",
+      "56)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ETFC/2012/page_24.pdf-1",
+    "predicted": [
+      "subtract(254000",
+      "#0)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ETFC/2007/page_18.pdf-2",
+    "predicted": [
+      "divide(166000",
+      "219000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GS/2017/page_179.pdf-4",
+    "predicted": [
+      "add(1.94e9",
+      "921e6)",
+      "add(#0",
+      "1.09e9)",
+      "add(#1",
+      "1.03e9)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MKTX/2004/page_99.pdf-3",
+    "predicted": [
+      "subtract(120000000",
+      "#0) for 2003",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ETR/2013/page_21.pdf-3",
+    "predicted": [
+      "subtract(1854",
+      "2045)",
+      "multiply(-1",
+      "#0)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GS/2013/page_220.pdf-2",
+    "predicted": [
+      "subtract(divide(248.36",
+      "100.00)",
+      "divide(236.20",
+      "100.00))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "FBHS/2017/page_83.pdf-1",
+    "predicted": [
+      "add(multiply(160196",
+      "58.02)",
+      "multiply(-95183",
+      "45.13)",
+      "multiply(-58285",
+      "48.22)",
+      "multiply(428328",
+      "52.35))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ZBH/2008/page_57.pdf-2",
+    "predicted": [
+      "divide(460.1",
+      "1020.1)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "K/2006/page_52.pdf-2",
+    "predicted": [
+      "add(divide(1143.3",
+      "2)",
+      "divide(1229.0",
+      "2))",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GPN/2014/page_92.pdf-1",
+    "predicted": [
+      "multiply(766801",
+      "40.85)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "FIS/2017/page_64.pdf-3",
+    "predicted": [
+      "divide(subtract(35",
+      "38)",
+      "35)",
+      "multiply(#0",
+      "100)",
+      "subtract(100",
+      "add(divide(subtract(42",
+      "47)",
+      "42)",
+      "100))",
+      "multiply(#1",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "BLL/2010/page_37.pdf-2",
+    "predicted": [
+      "subtract(559.7",
+      "515.2)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "PNC/2012/page_65.pdf-1",
+    "predicted": [
+      "divide(10400",
+      "61018)*100.0",
+      "EOF"
+    ]
+  },
+  {
+    "id": "SNA/2018/page_31.pdf-1",
+    "predicted": [
+      "subtract(630000",
+      "425000)",
+      "divide(#0",
+      "630000)",
+      "EOF"
+    ]
+  }
+]

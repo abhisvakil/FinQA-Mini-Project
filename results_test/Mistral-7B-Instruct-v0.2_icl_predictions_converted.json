@@ -1,0 +1,123 @@
+[
+  {
+    "id": "ETR/2016/page_23.pdf-2",
+    "predicted": [
+      "subtract(5829",
+      "5735)",
+      "add",
+      "(",
+      "187",
+      ")",
+      "add",
+      "(",
+      "95",
+      ")",
+      "subtract",
+      "(",
+      "32",
+      ")",
+      "subtract",
+      "(",
+      "35",
+      ")",
+      "add",
+      "(",
+      "107",
+      ")",
+      "subtract",
+      "(",
+      "14",
+      ")",
+      "EOF"
+    ]
+  },
+  {
+    "id": "INTC/2015/page_41.pdf-4",
+    "predicted": [
+      "divide(subtract(47.9",
+      "8.1)",
+      "56.0)",
+      "multiply(#0",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "ADI/2011/page_61.pdf-2",
+    "predicted": [
+      "subtract(20692",
+      "4614)",
+      "divide(#0",
+      "4614)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "FIS/2010/page_70.pdf-2",
+    "predicted": [
+      "divide(121.4",
+      "4187.8)",
+      "multiply(#0",
+      "1)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MAS/2017/page_27.pdf-2",
+    "predicted": [
+      "subtract(318.46",
+      "206.49)",
+      "divide(#0",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "SYY/2006/page_71.pdf-1",
+    "predicted": [
+      "subtract(100690000",
+      "86842000)",
+      "divide(#0",
+      "86842000)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "AES/2010/page_227.pdf-3",
+    "predicted": [
+      "divide(497",
+      "4612)",
+      "multiply(#0",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "GS/2015/page_188.pdf-2",
+    "predicted": [
+      "divide(301",
+      "2575)",
+      "multiply(#0",
+      "100)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "MO/2016/page_19.pdf-1",
+    "predicted": [
+      "greater(286.61",
+      "198.09)",
+      "EOF"
+    ]
+  },
+  {
+    "id": "CMCSA/2015/page_112.pdf-2",
+    "predicted": [
+      "subtract(1171",
+      "1136)",
+      "subtract(1701",
+      "1171)",
+      "EOF"
+    ]
+  }
+]

@@ -1,0 +1,9 @@
+{
+  "model": "mistralai/Mistral-7B-Instruct-v0.2",
+  "num_shots": 5,
+  "selection_method": "diverse",
+  "temperature": 0.1,
+  "num_predictions": 1147,
+  "timestamp": "2025-11-29T05:50:09.409533",
+  "config_file": "../configs/icl_config_1.yaml"
+}

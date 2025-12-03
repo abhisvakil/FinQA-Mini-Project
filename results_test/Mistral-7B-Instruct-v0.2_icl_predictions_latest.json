@@ -1,0 +1,452 @@
+[
+  {
+    "id": "ETR/2016/page_23.pdf-2",
+    "question": "what is the net change in net revenue during 2015 for entergy corporation?",
+    "predicted_program": "subtract(5829, 5735)",
+    "predicted_answer": "94",
+    "gold_program": "subtract(5829, 5735)",
+    "gold_answer": "94.0",
+    "raw_output": "subtract(5829, 5735)\nAnswer: 94\n\nNote: In this example, I assumed that the question asks for the net change in net revenue between 2015 and 2014, as indicated by the title of the section \"Net Change in Net Revenue During 2015 for Entergy Corporation.\" If the question had asked for the net revenue in 2015 instead, the answer would have been simply 5829. Similarly, if the question had asked for the net revenue in 2014 instead, the answer would have been 5735."
+  },
+  {
+    "id": "INTC/2015/page_41.pdf-4",
+    "question": "what percentage of total facilities as measured in square feet are leased?",
+    "predicted_program": "subtract(add(30.7, 17.2), 8.1)/56.0",
+    "predicted_answer": "0.87127",
+    "gold_program": "divide(8.1, 56.0)",
+    "gold_answer": "0.14464",
+    "raw_output": "subtract(add(30.7, 17.2), 8.1)/56.0\nAnswer: 0.87127"
+  },
+  {
+    "id": "ADI/2011/page_61.pdf-2",
+    "question": "what is the percentage change in cash flow hedges in 2011 compare to the 2010?",
+    "predicted_program": "### Final",
+    "predicted_answer": "divide(subtract(20692, 4614), 4614)",
+    "gold_program": "subtract(153.7, 139.9), divide(#0, 139.9)",
+    "gold_answer": "0.09864",
+    "raw_output": "subtract(20692, 4614)\nAnswer: 16078\n\nTo find the percentage change, we need to calculate the difference between the gain on swaps in 2011 and 2010, and then divide it by the gain on swaps in 2010.\n\nProgram: ### Final Answer:\ndivide(subtract(20692, 4614), 4614)\nAnswer: 3.4834343434343435"
+  },
+  {
+    "id": "FIS/2010/page_70.pdf-2",
+    "question": "what portion of total purchase price is related to stock awards?",
+    "predicted_program": "divide(121.4, 4187.8)",
+    "predicted_answer": "0.02898",
+    "gold_program": "divide(121.4, 4187.8)",
+    "gold_answer": "0.02899",
+    "raw_output": "divide(121.4, 4187.8)\n### Answer: 0.02898"
+  },
+  {
+    "id": "MAS/2017/page_27.pdf-2",
+    "question": "what was the difference in percentage cumulative total shareholder return on masco common stock versus the s&p 500 index for the five year period ended 2017?",
+    "predicted_program": "subtract(318.46, 206.49), divide(#0, 206.49)",
+    "predicted_answer": "0.53523",
+    "gold_program": "subtract(318.46, const_100), divide(#0, const_100), subtract(206.49, const_100), divide(#2, const_100), subtract(#1, #3)",
+    "gold_answer": "1.1197",
+    "raw_output": "subtract(318.46, 206.49), divide(#0, 206.49)\nAnswer: 0.53523"
+  },
+  {
+    "id": "SYY/2006/page_71.pdf-1",
+    "question": "what was the percentage change in total rental expense under operating leases from july 2 , 2005 to july 1 , 2006?",
+    "predicted_program": "subtract(100690000, 86842000), divide(#0, 86842000)",
+    "predicted_answer": "0.15185",
+    "gold_program": "subtract(92710000, 86842000), divide(#0, 86842000)",
+    "gold_answer": "0.06757",
+    "raw_output": "subtract(100690000, 86842000), divide(#0, 86842000)\nAnswer: 0.15185"
+  },
+  {
+    "id": "AES/2010/page_227.pdf-3",
+    "question": "what percent of total recourse debt is current?",
+    "predicted_program": "divide(497, 4612), multiply(#0, 100)",
+    "predicted_answer": "0.10759",
+    "gold_program": "divide(463, 4612)",
+    "gold_answer": "0.10039",
+    "raw_output": "divide(497, 4612), multiply(#0, 100)\nAnswer: 0.10759\n\nTherefore, approximately 10.76% of the total recourse debt is current."
+  },
+  {
+    "id": "GS/2015/page_188.pdf-2",
+    "question": "what percentage of future minimum rental payments are due in 2018?",
+    "predicted_program": "divide(sum(317, 313, 301), 2575), multiply(#0, 2018)",
+    "predicted_answer": "0.11732",
+    "gold_program": "divide(301, 2575)",
+    "gold_answer": "0.11689",
+    "raw_output": "divide(sum(317, 313, 301), 2575), multiply(#0, 2018)\nAnswer: 0.11732\n\nTherefore, approximately 11.73% of the future minimum rental payments are due in 2018."
+  },
+  {
+    "id": "MO/2016/page_19.pdf-1",
+    "question": "did altria outperform the s&p 500?",
+    "predicted_program": "greater(286.61, 198.09)",
+    "predicted_answer": "yes",
+    "gold_program": "greater(286.61, 198.09)",
+    "gold_answer": "yes",
+    "raw_output": "greater(286.61, 198.09)\nAnswer: yes"
+  },
+  {
+    "id": "CMCSA/2015/page_112.pdf-2",
+    "question": "what was the change in unrecognized tax benefits from the end of 2014 to the end of 2015?",
+    "predicted_program": "subtract(1171, 1136)",
+    "predicted_answer": "-35",
+    "gold_program": "subtract(1136, 1171)",
+    "gold_answer": "-35.0",
+    "raw_output": "subtract(1171, 1136)\nAnswer: -35\n\nExplanation:\nThe change in unrecognized tax benefits from the end of 2014 to the end of 2015 was a decrease of $ 35 million."
+  },
+  {
+    "id": "STT/2007/page_111.pdf-3",
+    "question": "what is the growth rate in the balance of standby letters of credit from 2006 to 2007?",
+    "predicted_program": "subtract(4926, 4711), divide(#0, 4711)",
+    "predicted_answer": "0.04247",
+    "gold_program": "subtract(4711, 4926), divide(#0, 4926)",
+    "gold_answer": "-0.04365",
+    "raw_output": "subtract(4926, 4711), divide(#0, 4711)\nAnswer: 0.04247"
+  },
+  {
+    "id": "UAA/2016/page_42.pdf-2",
+    "question": "what is the debt-to-asset ratio?",
+    "predicted_program": "divide(subtract(total_debt_including_current_maturities, total_stockholders_equity), total_assets)",
+    "predicted_answer": "0.22152313658634155",
+    "gold_program": "divide(817388, 3644331)",
+    "gold_answer": "0.22429",
+    "raw_output": "divide(subtract(total_debt_including_current_maturities, total_stockholders_equity), total_assets)\n### Final Answer: 0.22152313658634155"
+  },
+  {
+    "id": "GIS/2018/page_110.pdf-2",
+    "question": "what portion of the total noncancelable future lease commitments are due in fiscal year of 2019?",
+    "predicted_program": "subtract(559.3, 137.4), divide(#0, 431.9)",
+    "predicted_answer": "0.24685",
+    "gold_program": "divide(137.4, 559.3)",
+    "gold_answer": "0.24566",
+    "raw_output": "subtract(559.3, 137.4), divide(#0, 431.9)\nAnswer: 0.24685"
+  },
+  {
+    "id": "JKHY/2019/page_18.pdf-3",
+    "question": "was the five year total return of the 2019 peer group greater than the 2018 peer group?",
+    "predicted_program": "greater(281.09, 286.22)",
+    "predicted_answer": "No",
+    "gold_program": "greater(281.09, 286.22)",
+    "gold_answer": "no",
+    "raw_output": "greater(281.09, 286.22)\nAnswer: No.\n\nThe five-year total return of the 2018 peer group was actually higher than that of the 2019 peer group."
+  },
+  {
+    "id": "AWK/2014/page_121.pdf-2",
+    "question": "what was the percentage change in deferred tax assets and regulatory assets from 2013 to 2014",
+    "predicted_program": "subtract(195237, 177947), divide(#0, 177947)",
+    "predicted_answer": "0.11219",
+    "gold_program": "subtract(6348, 6241), divide(#0, 6241)",
+    "gold_answer": "0.01714",
+    "raw_output": "subtract(195237, 177947), divide(#0, 177947)\nAnswer: 0.11219"
+  },
+  {
+    "id": "MRO/2011/page_108.pdf-1",
+    "question": "what was the average net annual change in discounted future net cash flows ( in millions ) for the years 2011 , 2010 , and 2009?",
+    "predicted_program": "subtract(beginning_of_the_year, end_of_year), divide(#0, 3)",
+    "predicted_answer": "4306.66667",
+    "gold_program": "table_average(net change for the year, none)",
+    "gold_answer": "3297.66667",
+    "raw_output": "subtract(beginning_of_the_year, end_of_year), divide(#0, 3)\n\nAnswer: 4306.66667\n\nThis program calculates the net change for each year, then divides the difference between the beginning and ending balances by three to find the average net annual change."
+  },
+  {
+    "id": "RCL/2012/page_75.pdf-1",
+    "question": "assuming each continent has the same number of destinations , approximately how many destinations does each continent have?",
+    "predicted_program": "",
+    "predicted_answer": "approximately 6 destinations per continent",
+    "gold_program": "divide(455, const_7)",
+    "gold_answer": "65.0",
+    "raw_output": "# of continents = 7\n# destinations per continent = #ships / #continents\ndestinations_per_continent = divide(41, 7)\nFinal Answer: approximately 6 destinations per continent"
+  },
+  {
+    "id": "ETR/2017/page_372.pdf-1",
+    "question": "what was the average net revenue between 2016 and 2017 in millions",
+    "predicted_program": "add(705.4, 13.5), divide(#0, 2)",
+    "predicted_answer": "353.55",
+    "gold_program": "add(703.1, 705.4), add(#0, const_2), divide(#1, const_2)",
+    "gold_answer": "705.25",
+    "raw_output": "add(705.4, 13.5), divide(#0, 2)\nAnswer: 353.55"
+  },
+  {
+    "id": "ADBE/2008/page_89.pdf-3",
+    "question": "the combined amount of accrued interest and penalties related to tax positions taken on our tax returns and included in non-current income taxes payable was what percent of the total ending balance as of november 28 2008?",
+    "predicted_program": "divide(15300000, 139549000000), multiply(#0, 0.000001)",
+    "predicted_answer": "0.000111135",
+    "gold_program": "divide(139549, const_1000), divide(15.3, #0)",
+    "gold_answer": "0.10964",
+    "raw_output": "divide(15300000, 139549000000), multiply(#0, 0.000001)\nAnswer: 0.000111135"
+  },
+  {
+    "id": "JPM/2010/page_273.pdf-2",
+    "question": "in 2010 and 2009 , what was the total fair value in billions of assets segregated for the benefit of securities and futures brokerage customers?",
+    "predicted_program": "subtract(add(8291, 6263), 2094), divide(#0, 1000000000)",
+    "predicted_answer": "8.385",
+    "gold_program": "add(25.0, 24.0), add(9.7, 10.2), add(#1, #0)",
+    "gold_answer": "68.9",
+    "raw_output": "subtract(add(8291, 6263), 2094), divide(#0, 1000000000)\nAnswer: 8.385"
+  },
+  {
+    "id": "PNC/2012/page_68.pdf-2",
+    "question": "what was the percentage change in the commercial mortgage loans designated for sale at fair value from 2008 to 2009",
+    "predicted_program": "subtract(843, 772), divide(#0, 772)",
+    "predicted_answer": "0.08863",
+    "gold_program": "subtract(772, 843), divide(#0, 843)",
+    "gold_answer": "-0.08422",
+    "raw_output": "subtract(843, 772), divide(#0, 772)\nAnswer: 0.08863"
+  },
+  {
+    "id": "FIS/2016/page_31.pdf-2",
+    "question": "what was the difference in percentage cumulative 5-year total shareholder return on common stock fidelity national information services , inc . compared to the s&p 500 for the period ending 12/16?",
+    "predicted_program": "subtract(divide(311.81, 100.00), divide(198.18, 100.00)), multiply(#0, 100)",
+    "predicted_answer": "73.6456",
+    "gold_program": "subtract(198.18, const_100), divide(#0, const_100), subtract(311.81, const_100), divide(#2, const_100), subtract(#3, #1)",
+    "gold_answer": "1.1363",
+    "raw_output": "subtract(divide(311.81, 100.00), divide(198.18, 100.00)), multiply(#0, 100)\nAnswer: 73.6456"
+  },
+  {
+    "id": "AMT/2016/page_49.pdf-1",
+    "question": "for the quarter ended march 312015 what was the percentage change in the share price from the highest to the lowest",
+    "predicted_program": "subtract(101.88, 83.07), divide(#0, 83.07)",
+    "predicted_answer": "0.22547",
+    "gold_program": "subtract(101.88, 93.21), divide(#0, 93.21)",
+    "gold_answer": "0.09302",
+    "raw_output": "subtract(101.88, 83.07), divide(#0, 83.07)\nAnswer: 0.22547\n\nTherefore, the percentage change in the share price from the highest to the lowest for the quarter ended March 31, 2015 was approximately 22.55%."
+  },
+  {
+    "id": "MAR/2018/page_43.pdf-2",
+    "question": "of the total contractual obligations and off-balance sheet arrangements contractual obligations what percentage is due to capital lease obligations?",
+    "predicted_program": "divide(230, 13208), multiply(#0, 100)",
+    "predicted_answer": "0.017335999999999998",
+    "gold_program": "divide(230, 13208)",
+    "gold_answer": "0.01741",
+    "raw_output": "divide(230, 13208), multiply(#0, 100)\nAnswer: 0.017335999999999998"
+  },
+  {
+    "id": "AAL/2016/page_8.pdf-4",
+    "question": "what is the ratio of the total flight attendants to total maintenance personnel",
+    "predicted_program": "divide(26900, 16900)",
+    "predicted_answer": "1.5857142857142857",
+    "gold_program": "divide(26900, 16900)",
+    "gold_answer": "1.59172",
+    "raw_output": "divide(26900, 16900)\nAnswer: 1.5857142857142857"
+  },
+  {
+    "id": "ETFC/2007/page_18.pdf-1",
+    "question": "as of december 2007 what was the ratio of the square footage in alpharetta georgia to charlotte north carolina",
+    "predicted_program": "divide(219000, 83000)",
+    "predicted_answer": "2.6811025641025645",
+    "gold_program": "divide(219000, 83000)",
+    "gold_answer": "2.63855",
+    "raw_output": "divide(219000, 83000)\nAnswer: 2.6811025641025645"
+  },
+  {
+    "id": "GPN/2010/page_87.pdf-3",
+    "question": "in 2010 what was the percent of the income tax benefit to the stock based compensation cost",
+    "predicted_program": "divide(18.1, 18.1 + abs(6.3))",
+    "predicted_answer": "0.95315",
+    "gold_program": "divide(6.3, 18.1)",
+    "gold_answer": "0.34807",
+    "raw_output": "divide(18.1, 18.1 + abs(6.3))\nAnswer: 0.95315"
+  },
+  {
+    "id": "ADBE/2008/page_89.pdf-2",
+    "question": "what is the percentage change in the the gross liability for unrecognized tax benefits during 2008 compare to 2007?",
+    "predicted_program": "subtract(139549, 201808), divide(#0, 201808)",
+    "predicted_answer": "-0.45558",
+    "gold_program": "subtract(139549, 201808), divide(#0, 201808)",
+    "gold_answer": "-0.30851",
+    "raw_output": "subtract(139549, 201808), divide(#0, 201808)\nAnswer: -0.45558"
+  },
+  {
+    "id": "DG/2005/page_44.pdf-2",
+    "question": "what was the total impairment costs recorded from 2003 to 2005 in millions",
+    "predicted_program": "add(0.6, 0.6), add(0.5, 0.5), add(4.7, #0), add(#0, #0)",
+    "predicted_answer": "6.4",
+    "gold_program": "add(0.6, 0.5), add(#0, 4.7)",
+    "gold_answer": "5.8",
+    "raw_output": "add(0.6, 0.6), add(0.5, 0.5), add(4.7, #0), add(#0, #0)\nAnswer: 6.4"
+  },
+  {
+    "id": "ALXN/2016/page_153.pdf-2",
+    "question": "what is the borrowing under the term loan facility as a percentage of the total contractual maturities of long-term debt obligations due subsequent to december 31 , 2016?",
+    "predicted_program": "divide(175, sum(2014, 150, 1756))",
+    "predicted_answer": "0.05722",
+    "gold_program": "divide(3500, 3081)",
+    "gold_answer": "1.13599",
+    "raw_output": "divide(175, sum(2014, 150, 1756))\nAnswer: 0.05722"
+  },
+  {
+    "id": "UNP/2015/page_56.pdf-1",
+    "question": "in 2015 what was the percent of the total operating revenues associated with agriculture products",
+    "predicted_program": "divide(3581, 21813), multiply(#0, 100)",
+    "predicted_answer": "0.16553",
+    "gold_program": "divide(3581, 21813)",
+    "gold_answer": "0.16417",
+    "raw_output": "divide(3581, 21813), multiply(#0, 100)\nAnswer: 0.16553"
+  },
+  {
+    "id": "C/2009/page_45.pdf-1",
+    "question": "what percent of net interest revenue where total operating expenses in 2009?",
+    "predicted_program": "divide(net_revenue_2009, total_operating_expenses_2009)",
+    "predicted_answer": "0.3586",
+    "gold_program": "divide(896, 3173)",
+    "gold_answer": "0.28238",
+    "raw_output": "divide(net_revenue_2009, total_operating_expenses_2009)\n\nAnswer: 0.3586\n\nExplanation:\nTo find the percentage of net interest revenue where total operating expenses were in 2009, we need to divide the net interest revenue by the total operating expenses. We can find both values from the provided table.\n\nTherefore, the program would look like this:\n```python\nnet_revenue_2009 = 3173\ntotal_operating_expenses_2009 = 896\nFinal_Answer = divide(net_revenue_2009, total_operating_expenses_2009)\nprint('Final Answer:', Final_Answer)\n```\nThe output would be:\n```\nFinal Answer: 0.3586\n```"
+  },
+  {
+    "id": "AAPL/2006/page_100.pdf-3",
+    "question": "what was the greatest provision for income taxes , in millions?",
+    "predicted_program": "",
+    "predicted_answer": "224",
+    "gold_program": "table_max(provision for income taxes, none)",
+    "gold_answer": "829.0",
+    "raw_output": "maximum(86, 224)\nAnswer: 224"
+  },
+  {
+    "id": "JPM/2018/page_90.pdf-1",
+    "question": "in 2018 what was the percent of the cib markets net interest income as part of the managed interest income",
+    "predicted_program": "divide(3087, 52600), multiply(#0, 100)",
+    "predicted_answer": "0.05898",
+    "gold_program": "divide(3087, 55687)",
+    "gold_answer": "0.05543",
+    "raw_output": "divide(3087, 52600), multiply(#0, 100)\nAnswer: 0.05898"
+  },
+  {
+    "id": "PNC/2012/page_65.pdf-4",
+    "question": "what would the fair value of total securities available for sale be without the fair value of securities classified as corporate stocks as of december 31 , 2012?",
+    "predicted_program": "subtract(51052, 367)",
+    "predicted_answer": "47385",
+    "gold_program": "subtract(61912, 367)",
+    "gold_answer": "61545.0",
+    "raw_output": "subtract(51052, 367)\nAnswer: 47385\n\nThis answer represents the fair value of total securities available for sale without the fair value of securities classified as corporate stocks as of December 31, 2012."
+  },
+  {
+    "id": "ABMD/2008/page_86.pdf-1",
+    "question": "assuming the same level of settlements as in fiscal 2007 , what would be the ending balance at march 31 2008 in millions for unrecognized tax benefits?\\\\n",
+    "predicted_program": "subtract(224, 56), add(#0, #0)",
+    "predicted_answer": "168",
+    "gold_program": "subtract(168, 56)",
+    "gold_answer": "112.0",
+    "raw_output": "subtract(224, 56), add(#0, #0)\nAnswer: 168"
+  },
+  {
+    "id": "ETFC/2012/page_24.pdf-1",
+    "question": "as of december 2012 what is the percent of the square footage not leased to the total square footage in alpharetta , georgia",
+    "predicted_program": "subtract(254000, #0)/divide(#0, 1000000)",
+    "predicted_answer": "0.4882",
+    "gold_program": "divide(165000, 254000)",
+    "gold_answer": "0.64961",
+    "raw_output": "subtract(254000, #0)/divide(#0, 1000000)\nAnswer: 0.4882"
+  },
+  {
+    "id": "ETFC/2007/page_18.pdf-2",
+    "question": "as of december 2007 what was the percent of the square footage in alpharetta georgia not yet leased",
+    "predicted_program": "subtract(219000, 166000), divide(#0, 219000)",
+    "predicted_answer": "0.07538",
+    "gold_program": "divide(166000, 219000)",
+    "gold_answer": "0.75799",
+    "raw_output": "subtract(219000, 166000), divide(#0, 219000)\nAnswer: 0.07538"
+  },
+  {
+    "id": "GS/2017/page_179.pdf-4",
+    "question": "what is the total amount of stock options cancelled in millions during 2017 , 2016 and 2015?",
+    "predicted_program": "add(8.1, 6.1), add(8.1, 5.7)",
+    "predicted_answer": "19.8",
+    "gold_program": "add(4.6, 5.5), add(#0, const_2)",
+    "gold_answer": "12.1",
+    "raw_output": "add(8.1, 6.1), add(8.1, 5.7)\n### Final Answer: 19.8\n\nThis program adds the number of cancelled RSUs in 2016 and 2015 to find the total number cancelled during those two years, then adds the number cancelled in 2017 to get the total number cancelled during all three years."
+  },
+  {
+    "id": "MKTX/2004/page_99.pdf-3",
+    "question": "in 2004 and 2003 , what were the total shares of common stock that were issued to employees?",
+    "predicted_program": "subtract(110000000, 100000000), subtract(120000000, 120000000)",
+    "predicted_answer": "100000000",
+    "gold_program": "add(1939734, 1937141)",
+    "gold_answer": "3876875.0",
+    "raw_output": "subtract(110000000, 100000000), subtract(120000000, 120000000)\nAnswer: 100000000\n\n### Final Answer: 100,000,000\n\nThis answer represents the total number of common stock shares issued to employees between 2003 and 2004."
+  },
+  {
+    "id": "ETR/2013/page_21.pdf-3",
+    "question": "what is the net change in net revenue for entergy wholesale commodities during 2012?",
+    "predicted_program": "subtract(2045, 1854)",
+    "predicted_answer": "191",
+    "gold_program": "subtract(1854, 2045)",
+    "gold_answer": "-191.0",
+    "raw_output": "subtract(2045, 1854)\n### Answer: 191"
+  },
+  {
+    "id": "GS/2013/page_220.pdf-2",
+    "question": "what was the difference in percentage cumulative total return for goldman sachs group inc . and the s&p 500 index for the five year period ending 12/31/13?",
+    "predicted_program": "subtract(248.36, 236.20), divide(#0, 236.20)",
+    "predicted_answer": "0.04285 or 4.29",
+    "gold_program": "subtract(248.36, const_100), divide(#0, const_100), subtract(236.20, const_100), divide(#2, const_100), subtract(#1, #3)",
+    "gold_answer": "0.1216",
+    "raw_output": "subtract(248.36, 236.20), divide(#0, 236.20)\nAnswer: 0.04285 or 4.29%"
+  },
+  {
+    "id": "FBHS/2017/page_83.pdf-1",
+    "question": "as of december 31 , 2017 what was the value of the granted share awards",
+    "predicted_program": "add(5.6, 6.8), multiply(#0, 1.3)",
+    "predicted_answer": "11.4544",
+    "gold_program": "multiply(160196, 58.02)",
+    "gold_answer": "9294571.92",
+    "raw_output": "add(5.6, 6.8), multiply(#0, 1.3)\nAnswer: 11.4544"
+  },
+  {
+    "id": "ZBH/2008/page_57.pdf-2",
+    "question": "what percent of total contractual obligations is categorized as long term debt?",
+    "predicted_program": "divide(460.1, 1020.1)",
+    "predicted_answer": "0.45255",
+    "gold_program": "divide(460.1, 1020.1)",
+    "gold_answer": "0.45103",
+    "raw_output": "divide(460.1, 1020.1)\nAnswer: 0.45255"
+  },
+  {
+    "id": "K/2006/page_52.pdf-2",
+    "question": "what was the average cash flow from 2004 to 2006",
+    "predicted_program": "add(1143.3, 950.4, 1229.0)/3",
+    "predicted_answer": "1135.5333333333333",
+    "gold_program": "add(957.4, 769.1), add(950.4, #0), divide(#1, const_3)",
+    "gold_answer": "892.3",
+    "raw_output": "add(1143.3, 950.4, 1229.0)/3\nAnswer: 1135.5333333333333"
+  },
+  {
+    "id": "GPN/2014/page_92.pdf-1",
+    "question": "what is the total value of securities issued and approved by security holders , ( in millions ) ?",
+    "predicted_program": "add(766801, 8945694)",
+    "predicted_answer": "16,011,695",
+    "gold_program": "multiply(766801, 40.85), divide(#0, const_1000000)",
+    "gold_answer": "31.32382",
+    "raw_output": "add(766801, 8945694)\nAnswer: 16,011,695"
+  },
+  {
+    "id": "FIS/2017/page_64.pdf-3",
+    "question": "what is the percentage change in revenue generated from non-us currencies from 2015 to 2016?",
+    "predicted_program": "subtract(38, 32), add(38, 32), divide(#0, 38), multiply(#0, 100)",
+    "predicted_answer": "26.31578947368421",
+    "gold_program": "subtract(1909, 1336), divide(#0, 1336)",
+    "gold_answer": "0.42889",
+    "raw_output": "subtract(38, 32), add(38, 32), divide(#0, 38), multiply(#0, 100)\nAnswer: 26.31578947368421"
+  },
+  {
+    "id": "BLL/2010/page_37.pdf-2",
+    "question": "what was the percentage decrease in cash flows from operations from 2009 to 2010?",
+    "predicted_program": "subtract(559.7, 515.2)",
+    "predicted_answer": "-44.5",
+    "gold_program": "subtract(559.7, 515.2), divide(#0, 559.7)",
+    "gold_answer": "0.07951",
+    "raw_output": "subtract(559.7, 515.2)\nAnswer: -44.5"
+  },
+  {
+    "id": "PNC/2012/page_65.pdf-1",
+    "question": "what percentage of the total carrying amount of investment securities is the securities held to maturity?",
+    "predicted_program": "divide(10860, 61018)*100",
+    "predicted_answer": "17.819645675238528",
+    "gold_program": "divide(10.4, 61.4), multiply(#0, const_100)",
+    "gold_answer": "16.93811",
+    "raw_output": "divide(10860, 61018)*100\nAnswer: 17.819645675238528"
+  },
+  {
+    "id": "SNA/2018/page_31.pdf-1",
+    "question": "for the quarter ended 12/29/2018 what was the percent of the total shares bought after 11/25/2018",
+    "predicted_program": "divide(205000, 630000), multiply(#0, 100)",
+    "predicted_answer": "0.32731",
+    "gold_program": "divide(205000, 630000)",
+    "gold_answer": "0.3254",
+    "raw_output": "divide(205000, 630000), multiply(#0, 100)\nAnswer: 0.32731"
+  }
+]

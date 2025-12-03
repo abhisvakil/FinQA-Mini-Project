@@ -1,0 +1,92 @@
+[
+  {
+    "id": "ETR/2016/page_23.pdf-2",
+    "question": "what is the net change in net revenue during 2015 for entergy corporation?",
+    "predicted_program": "subtract(5829, 5735), add(187), add(95), subtract(32), subtract(35), add(107), subtract(14)",
+    "predicted_answer": "",
+    "gold_program": "subtract(5829, 5735)",
+    "gold_answer": "94.0",
+    "raw_output": "subtract(5829, 5735), add(187), add(95), subtract(32), subtract(35), add(107), subtract(14)"
+  },
+  {
+    "id": "INTC/2015/page_41.pdf-4",
+    "question": "what percentage of total facilities as measured in square feet are leased?",
+    "predicted_program": "divide(subtract(47.9, 8.1), 56.0), multiply(#0, 100)",
+    "predicted_answer": "",
+    "gold_program": "divide(8.1, 56.0)",
+    "gold_answer": "0.14464",
+    "raw_output": "divide(subtract(47.9, 8.1), 56.0), multiply(#0, 100)"
+  },
+  {
+    "id": "ADI/2011/page_61.pdf-2",
+    "question": "what is the percentage change in cash flow hedges in 2011 compare to the 2010?",
+    "predicted_program": "subtract(20692, 4614), divide(#0, 4614)",
+    "predicted_answer": "",
+    "gold_program": "subtract(153.7, 139.9), divide(#0, 139.9)",
+    "gold_answer": "0.09864",
+    "raw_output": "subtract(20692, 4614), divide(#0, 4614)"
+  },
+  {
+    "id": "FIS/2010/page_70.pdf-2",
+    "question": "what portion of total purchase price is related to stock awards?",
+    "predicted_program": "divide(121.4, 4187.8), multiply(#0, 1)",
+    "predicted_answer": "",
+    "gold_program": "divide(121.4, 4187.8)",
+    "gold_answer": "0.02899",
+    "raw_output": "divide(121.4, 4187.8), multiply(#0, 1)\nAnswer: 0.02913"
+  },
+  {
+    "id": "MAS/2017/page_27.pdf-2",
+    "question": "what was the difference in percentage cumulative total shareholder return on masco common stock versus the s&p 500 index for the five year period ended 2017?",
+    "predicted_program": "subtract(318.46, 206.49), divide(#0, 100)",
+    "predicted_answer": "",
+    "gold_program": "subtract(318.46, const_100), divide(#0, const_100), subtract(206.49, const_100), divide(#2, const_100), subtract(#1, #3)",
+    "gold_answer": "1.1197",
+    "raw_output": "subtract(318.46, 206.49), divide(#0, 100)\nAnswer: 0.54325"
+  },
+  {
+    "id": "SYY/2006/page_71.pdf-1",
+    "question": "what was the percentage change in total rental expense under operating leases from july 2 , 2005 to july 1 , 2006?",
+    "predicted_program": "subtract(100690000, 86842000), divide(#0, 86842000)",
+    "predicted_answer": "",
+    "gold_program": "subtract(92710000, 86842000), divide(#0, 86842000)",
+    "gold_answer": "0.06757",
+    "raw_output": "subtract(100690000, 86842000), divide(#0, 86842000)"
+  },
+  {
+    "id": "AES/2010/page_227.pdf-3",
+    "question": "what percent of total recourse debt is current?",
+    "predicted_program": "divide(497, 4612), multiply(#0, 100)",
+    "predicted_answer": "",
+    "gold_program": "divide(463, 4612)",
+    "gold_answer": "0.10039",
+    "raw_output": "divide(497, 4612), multiply(#0, 100)"
+  },
+  {
+    "id": "GS/2015/page_188.pdf-2",
+    "question": "what percentage of future minimum rental payments are due in 2018?",
+    "predicted_program": "divide(301, 2575), multiply(#0, 100)",
+    "predicted_answer": "",
+    "gold_program": "divide(301, 2575)",
+    "gold_answer": "0.11689",
+    "raw_output": "divide(301, 2575), multiply(#0, 100)"
+  },
+  {
+    "id": "MO/2016/page_19.pdf-1",
+    "question": "did altria outperform the s&p 500?",
+    "predicted_program": "greater(286.61, 198.09)",
+    "predicted_answer": "",
+    "gold_program": "greater(286.61, 198.09)",
+    "gold_answer": "yes",
+    "raw_output": "greater(286.61, 198.09)"
+  },
+  {
+    "id": "CMCSA/2015/page_112.pdf-2",
+    "question": "what was the change in unrecognized tax benefits from the end of 2014 to the end of 2015?",
+    "predicted_program": "subtract(1171, 1136), subtract(1701, 1171)",
+    "predicted_answer": "",
+    "gold_program": "subtract(1136, 1171)",
+    "gold_answer": "-35.0",
+    "raw_output": "subtract(1171, 1136), subtract(1701, 1171)\nAnswer:\n[135, -635]"
+  }
+]
