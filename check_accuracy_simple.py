@@ -44,6 +44,10 @@ def equal_program(program1, program2):
     program1: gold (string)
     program2: pred (string)
     """
+    # Quick check: if strings are identical, return True immediately
+    if program1 == program2:
+        return True
+    
     try:
         # Tokenize both programs
         prog1_tokens = program_tokenization(program1)
