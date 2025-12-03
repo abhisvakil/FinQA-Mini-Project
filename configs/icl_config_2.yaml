@@ -7,80 +7,95 @@ model:
   load_in_8bit: false
 
 generation:
-  max_new_tokens: 256
+  max_new_tokens: 512
   temperature: 0.1
   top_p: 0.95
   top_k: 50
   do_sample: true
   num_beams: 1
-  repetition_penalty: 1.1
+  repetition_penalty: 1.2
 
 icl:
   num_shots: 5
   example_selection: "diverse"
 
-# SYSTEM PROMPT for a chatty, concise, conversational model
+# SYSTEM PROMPT - Conversational, encouraging style (different from config_1's formal tone)
 system_prompt: |
-  You are an expert financial assistant here to help analyze tables and answer complex questions. 
-  For each question, figure out the calculation step by step—write out your reasoning as a program using only the following operations:
-
-    - add(a, b): Add two numbers
-    - subtract(a, b): Subtract b from a
-    - multiply(a, b): Multiply two numbers
-    - divide(a, b): Divide a by b
-    - greater(a, b): Return the greater of two numbers
-    - exp(a, b): Calculate a raised to the power of b
-
-  After your reasoning program, share the final answer you calculate. 
-  Your response should have both parts, like this:
+  You're a financial assistant helping me solve numerical questions! Here's how we'll work together:
   
-  Program:
-  Answer:
+  When I give you a question with some data, you'll write a simple program to calculate the answer. 
+  Think of it like showing your work in math class - step by step!
+  
+  You have 6 operations to work with:
+  • add(a, b) - adds two numbers together
+  • subtract(a, b) - subtracts b from a  
+  • multiply(a, b) - multiplies two numbers
+  • divide(a, b) - divides a by b
+  • greater(a, b) - tells me which number is bigger
+  • exp(a, b) - raises a to the power of b
+  
+  Quick tips:
+  - Use the actual numbers from my data (like 150, 200.5) - don't use const() or made-up variable names
+  - If you need multiple steps, separate them with ", " and reference earlier results as #0, #1, etc.
+  - Always give me both: the Program (your calculation) AND the Answer (the final number)
+  
+  Format your response like this:
+  Program: your_calculation_here
+  Answer: your_final_result
+  
+  Keep it simple - just those two lines, nothing extra!
 
-  Don't add any extra explanation—just the program and answer, nice and clear!
-
-# Prompt template is slightly less formal, and includes encouragement to be helpful and clear:
+# Conversational, friendly prompt template (vs config_1's formal "Now answer the following")
 prompt_template: |
   {system_prompt}
 
-  Examples for you to follow:
+  Let me show you some examples to get you started:
 
   {few_shot_examples}
 
-  Please now solve this:
+  Great! Now here's your question to solve:
 
   Question: {question}
-  Context:
+  
   {context}
 
   Program:
-  Answer:
 
 # Examples will be programmatically filled, but here is placeholder structure:
+# Examples with conversational style, proper format (no const), and answers
 few_shot_examples:
   - question: "What was the net profit for Q4 and Q2?"
     context: |
-      Table:
       | Quarter | Profit |
       | Q2      | 400    |
       | Q4      | 700    |
-    program: "add(const(400), const(700))"
+    program: "add(400, 700)"
+    answer: "1100"
+    
   - question: "What is the gross margin percentage in 2021?"
     context: |
-      Table:
       | Year | Revenue | COGS |
       | 2021 | 900     | 600  |
-    program: "multiply(divide(subtract(const(900), const(600)), const(900)), const(100))"
+    program: "subtract(900, 600), divide(#0, 900), multiply(#1, 100)"
+    answer: "33.33"
+    
   - question: "Show the difference in earnings between 2020 and 2021."
     context: |
-      Table:
       | Year | Earnings |
       | 2020 | 300      |
       | 2021 | 450      |
-    program: "subtract(const(450), const(300))"
-
+    program: "subtract(450, 300)"
+    answer: "150"
+  
+  - question: "Which year had higher revenue?"
+    context: |
+      | Year | Revenue |
+      | 2020 | 500     |
+      | 2021 | 650     |
+    program: "greater(650, 500)"
+    answer: "yes"
 data:
-  test_file: "data/test.json"
+  test_file: "data/simplified/test_simplified.json"
   output_file: "results/icl_config_2/predictions.json"
   max_samples: null
 
