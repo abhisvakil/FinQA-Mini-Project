@@ -177,9 +177,13 @@ def equal_program(program1, program2):
         
         # Derive symbolic expressions
         steps1 = program1_str.split(")")[:-1]
+        if not steps1:
+            return False
         sym_prog1 = symbol_recur(steps1[-1], step_dict_1)
         
         steps2 = program2_str.split(")")[:-1]
+        if not steps2:
+            return False
         sym_prog2 = symbol_recur(steps2[-1], step_dict_2)
         
         # For boolean operations (greater/less), compare strings directly
@@ -194,8 +198,8 @@ def equal_program(program1, program2):
     except Exception as e:
         # If any error in symbolic comparison, fall back to False
         # Debug: Uncomment below to see errors
-        print(f"ERROR in equal_program: {e}")
-        import traceback; traceback.print_exc()
+        # print(f"ERROR in equal_program: {e}")
+        # import traceback; traceback.print_exc()
         return False
 
 # Load predictions from file
