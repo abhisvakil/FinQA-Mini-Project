@@ -240,8 +240,53 @@ print("=" * 80)
 correct_programs = 0
 correct_answers = 0
 
+def clean_program(program):
+    """Remove ### Final Answer or ### patterns from program"""
+    program = program.strip()
+    
+    # Handle truncated "### Final" or similar incomplete patterns
+    if program == "### Final" or program == "###" or program.startswith("### ") and len(program) < 20:
+        return ""  # Return empty for clearly broken programs
+    
+    # Remove "### Final Answer:" and everything after
+    if "### Final Answer:" in program:
+        program = program.split("### Final Answer:")[0].strip()
+    elif "###" in program:
+        # Remove standalone ### and everything after
+        program = program.split("###")[0].strip()
+    
+    # Remove "Final Answer:" without ###
+    if "Final Answer:" in program:
+        program = program.split("Final Answer:")[0].strip()
+    
+    # Remove "Answer:" if it appears (keep only program part)
+    if "\nAnswer:" in program:
+        program = program.split("\nAnswer:")[0].strip()
+    elif program.startswith("Answer:"):
+        # If it starts with Answer:, this is wrong - return empty
+        return ""
+    
+    # Remove "Program:" prefix if present
+    if program.startswith("Program:"):
+        program = program.replace("Program:", "", 1).strip()
+    
+    # Fix inline division: replace "/" with proper divide() format
+    # e.g., "subtract(add(30.7, 17.2), 8.1)/56.0" is invalid
+    # This is complex to fix programmatically, so just flag as invalid
+    if "/" in program and "divide" not in program:
+        # Invalid format - contains raw division operator
+        pass  # Keep as-is, will fail symbolic comparison
+    
+    # Remove explanatory text after newlines
+    if "\n" in program:
+        # Keep only first line (the program)
+        program = program.split("\n")[0].strip()
+    
+    return program
+
 for i, pred in enumerate(predictions, 1):
-    pred_prog = pred['predicted_program'].strip()
+    # Clean predicted program before comparison
+    pred_prog = clean_program(pred['predicted_program'])
     gold_prog = pred['gold_program'].strip()
     
     pred_ans = str(pred['predicted_answer']).strip()
