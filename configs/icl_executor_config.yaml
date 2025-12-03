@@ -101,7 +101,7 @@ prompt_template: |
 data:
   test_file: "src/data/test.json"
   output_file: "results/icl_executor_predictions.json"
-  max_samples: 10  # Start with 10 for testing, set to null for all
+  max_samples: 50  # Start with 10 for testing, set to null for all
 
 # Inference settings
 inference:
