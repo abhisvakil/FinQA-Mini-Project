@@ -21,6 +21,9 @@ PRED_DIR="$RESULTS_DIR/predictions"
 LLAMA_MODEL="meta-llama/Meta-Llama-3-8B-Instruct"
 MISTRAL_MODEL="mistralai/Mistral-7B-Instruct-v0.2"
 
+# Sampling (set to limit test samples, or leave empty for all)
+NUM_SAMPLES=""  # e.g., "100" for quick testing, or "" for all samples
+
 echo -e "${BLUE}============================================================${NC}"
 echo -e "${BLUE}       FinQA PEFT vs ICL - Complete Pipeline${NC}"
 echo -e "${BLUE}============================================================${NC}\n"
@@ -184,7 +187,8 @@ function infer_icl_llama() {
         --config ../configs/icl_${config}.yaml \
         --model_name "$LLAMA_MODEL" \
         --data_dir "../$DATA_DIR" \
-        --output_dir "../$PRED_DIR"
+        --output_dir "../$PRED_DIR" \
+        ${NUM_SAMPLES:+--max_samples $NUM_SAMPLES}
     cd ..
     echo -e "${YELLOW}✓ ICL Llama inference complete${NC}\n"
 }
@@ -198,7 +202,8 @@ function infer_icl_mistral() {
         --config ../configs/icl_${config}.yaml \
         --model_name "$MISTRAL_MODEL" \
         --data_dir "../$DATA_DIR" \
-        --output_dir "../$PRED_DIR"
+        --output_dir "../$PRED_DIR" \
+        ${NUM_SAMPLES:+--max_samples $NUM_SAMPLES}
     cd ..
     echo -e "${YELLOW}✓ ICL Mistral inference complete${NC}\n"
 }
