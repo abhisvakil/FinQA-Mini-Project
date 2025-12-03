@@ -1,0 +1,582 @@
+[
+  {
+    "id": "ETR/2016/page_23.pdf-2",
+    "question": "what is the net change in net revenue during 2015 for entergy corporation?",
+    "predicted_program": "subtract(5829, 5735), add(#0, 154), subtract(#0, 107), subtract(#0, 32), subtract(#0, 35), subtract(#0, 14)",
+    "predicted_answer": "80.0",
+    "gold_program": "subtract(5829, 5735)",
+    "gold_answer": "94.0",
+    "executor_success": true,
+    "executor_answer": "80.0",
+    "attempts": 1,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "subtract(5829, 5735), add(#0, 154), subtract(#0, 107), subtract(#0, 32), subtract(#0, 35), subtract(#0, 14)",
+        "predicted_answer": "1115.0",
+        "executor_result": {
+          "success": true,
+          "answer": 80.0,
+          "error": null,
+          "error_type": null,
+          "step_failed": null,
+          "trace": [
+            {
+              "step": 0,
+              "operation": "subtract(5829, 5735)",
+              "result": 94.0,
+              "reference": "#0"
+            },
+            {
+              "step": 1,
+              "operation": "add(#0, 154)",
+              "result": 248.0,
+              "reference": "#1"
+            },
+            {
+              "step": 2,
+              "operation": "subtract(#0, 107)",
+              "result": -13.0,
+              "reference": "#2"
+            },
+            {
+              "step": 3,
+              "operation": "subtract(#0, 32)",
+              "result": 62.0,
+              "reference": "#3"
+            },
+            {
+              "step": 4,
+              "operation": "subtract(#0, 35)",
+              "result": 59.0,
+              "reference": "#4"
+            },
+            {
+              "step": 5,
+              "operation": "subtract(#0, 14)",
+              "result": 80.0,
+              "reference": "#5"
+            }
+          ],
+          "feedback": "\u2705 Program executed successfully"
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\nA: The net change in net revenue during 2015 for Entergy Corporation is:\n\nProgram: subtract(5829, 5735), add(#0, 154), subtract(#0, 107), subtract(#0, 32), subtract(#0, 35), subtract(#0, 14)\nAnswer: 1115.0\n\nExplanation:\nThe table shows the net revenue for 2014 and 2015, as well as some line items that affected the change between those years. We need to calculate the net change in net revenue, which means finding the difference between the net revenues in 2015 and 2014, and then adjusting for the specific line items mentioned in the text.\n\nFirst, we calculate the difference between the net revenues in 2015 and 2014:\nsubtract(5829, 5735) = 1115.0\n\nNext, we adjust for the specific line items mentioned in the"
+      }
+    ],
+    "raw_output": "Answer:\n\nA: The net change in net revenue during 2015 for Entergy Corporation is:\n\nProgram: subtract(5829, 5735), add(#0, 154), subtract(#0, 107), subtract(#0, 32), subtract(#0, 35), subtract(#0, 14)\nAnswer: 1115.0\n\nExplanation:\nThe table shows the net revenue for 2014 and 2015, as well as some line items that affected the change between those years. We need to calculate the net change in net revenue, which means finding the difference between the net revenues in 2015 and 2014, and then adjusting for the specific line items mentioned in the text.\n\nFirst, we calculate the difference between the net revenues in 2015 and 2014:\nsubtract(5829, 5735) = 1115.0\n\nNext, we adjust for the specific line items mentioned in the"
+  },
+  {
+    "id": "INTC/2015/page_41.pdf-4",
+    "question": "what percentage of total facilities as measured in square feet are leased?",
+    "predicted_program": "divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), total_facilities[0]+total_facilities[1])",
+    "predicted_answer": "0.03732",
+    "gold_program": "divide(8.1, 56.0)",
+    "gold_answer": "0.14464",
+    "executor_success": false,
+    "executor_answer": "",
+    "attempts": 3,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "A: Program: divide(sum(owned_facilities[0], leased_facilities[0]), total_facilities[0]), multiply(#0, 100)",
+        "predicted_answer": "63.72363636363636%",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for divide: Cannot resolve argument 'sum(owned_facilities[0]' to a number",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: divide(sum(owned_facilities[0], leased_facilities[0])\nError: Error resolving arguments for divide: Cannot resolve argument 'sum(owned_facilities[0]' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again."
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\nA: Program: divide(sum(owned_facilities[0], leased_facilities[0]), total_facilities[0]), multiply(#0, 100)\nAnswer: 63.72363636363636%"
+      },
+      {
+        "attempt": 1,
+        "predicted_program": "divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), sum(owned_facilities[0], owned_facilities[1]))",
+        "predicted_answer": "0.0373",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for divide: Cannot resolve argument 'sum(leased_facilities[0]' to a number",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2])\nError: Error resolving arguments for divide: Cannot resolve argument 'sum(leased_facilities[0]' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: divide(sum(owned_facilities[0], leased_facilities[0])\nError: Error resolving arguments for divide: Cannot resolve argument 'sum(owned_facilities[0]' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again.",
+        "raw_output": "Answer:\n\n---\n\nProgram: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), sum(owned_facilities[0], owned_facilities[1]))\nAnswer: 0.03734\n\nExplanation:\nThe context provides the square footage measurements for both owned and leased facilities in the United States and other countries. We need to calculate the percentage of total facilities that are leased.\n\nFirst, we sum up the square footage measurements for leased facilities in the United States, other countries, and the total. Similarly, we sum up the square footage measurements for owned facilities in the United States, other countries, and the total.\n\nThen, we divide the sum of leased facilities by the sum of owned facilities to get the percentage.\n\nTherefore, the program should look like this:\n```vbnet\nProgram: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), sum(owned_facilities[0], owned_facilities[1]))\nAnswer: 0.0373"
+      },
+      {
+        "attempt": 2,
+        "predicted_program": "divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), total_facilities[0]+total_facilities[1])",
+        "predicted_answer": "0.03732",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for divide: Cannot resolve argument 'sum(leased_facilities[0]' to a number",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2])\nError: Error resolving arguments for divide: Cannot resolve argument 'sum(leased_facilities[0]' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2])\nError: Error resolving arguments for divide: Cannot resolve argument 'sum(leased_facilities[0]' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again.",
+        "raw_output": "Answer:\n\n---\n\nProgram: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), total_facilities[0]+total_facilities[1])\nAnswer: 0.03732\n\nExplanation:\nThe context provides the square footage (in millions) for owned facilities and leased facilities in the US and other countries. We need to calculate the percentage of total facilities that are leased.\n\nFirst, we sum up the square footage for leased facilities in the US and other countries: `sum(leased_facilities[0], leased_facilities[1], leased_facilities[2])`\n\nNext, we calculate the total square footage for all facilities by adding the total square footage for owned facilities and leased facilities: `total_facilities[0]+total_facilities[1]`\n\nFinally, we calculate the percentage by dividing the sum of leased facilities by the total facilities and multiplying by 100: `divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities"
+      }
+    ],
+    "raw_output": "Answer:\n\n---\n\nProgram: divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities[2]), total_facilities[0]+total_facilities[1])\nAnswer: 0.03732\n\nExplanation:\nThe context provides the square footage (in millions) for owned facilities and leased facilities in the US and other countries. We need to calculate the percentage of total facilities that are leased.\n\nFirst, we sum up the square footage for leased facilities in the US and other countries: `sum(leased_facilities[0], leased_facilities[1], leased_facilities[2])`\n\nNext, we calculate the total square footage for all facilities by adding the total square footage for owned facilities and leased facilities: `total_facilities[0]+total_facilities[1]`\n\nFinally, we calculate the percentage by dividing the sum of leased facilities by the total facilities and multiplying by 100: `divide(sum(leased_facilities[0], leased_facilities[1], leased_facilities"
+  },
+  {
+    "id": "ADI/2011/page_61.pdf-2",
+    "question": "what is the percentage change in cash flow hedges in 2011 compare to the 2010?",
+    "predicted_program": "subtract(153.7, 139.9), divide(#0, 139.9), multiply(#1, 100)",
+    "predicted_answer": "9.86419",
+    "gold_program": "subtract(153.7, 139.9), divide(#0, 139.9)",
+    "gold_answer": "0.09864",
+    "executor_success": true,
+    "executor_answer": "9.864188706218716",
+    "attempts": 1,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "subtract(153.7, 139.9), divide(#0, 139.9), multiply(#1, 100)",
+        "predicted_answer": "12.1",
+        "executor_result": {
+          "success": true,
+          "answer": 9.864188706218716,
+          "error": null,
+          "error_type": null,
+          "step_failed": null,
+          "trace": [
+            {
+              "step": 0,
+              "operation": "subtract(153.7, 139.9)",
+              "result": 13.799999999999983,
+              "reference": "#0"
+            },
+            {
+              "step": 1,
+              "operation": "divide(#0, 139.9)",
+              "result": 0.09864188706218716,
+              "reference": "#1"
+            },
+            {
+              "step": 2,
+              "operation": "multiply(#1, 100)",
+              "result": 9.864188706218716,
+              "reference": "#2"
+            }
+          ],
+          "feedback": "\u2705 Program executed successfully"
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\nA: The percentage change in cash flow hedges in 2011 compared to 2010 is:\nProgram: subtract(153.7, 139.9), divide(#0, 139.9), multiply(#1, 100)\nAnswer: 12.1"
+      }
+    ],
+    "raw_output": "Answer:\n\nA: The percentage change in cash flow hedges in 2011 compared to 2010 is:\nProgram: subtract(153.7, 139.9), divide(#0, 139.9), multiply(#1, 100)\nAnswer: 12.1"
+  },
+  {
+    "id": "FIS/2010/page_70.pdf-2",
+    "question": "what portion of total purchase price is related to stock awards?",
+    "predicted_program": "divide(value_of_metavante_stock_awards, total_purchase_price), multiply(#0, 100)",
+    "predicted_answer": "2.912126530612243",
+    "gold_program": "divide(121.4, 4187.8)",
+    "gold_answer": "0.02899",
+    "executor_success": false,
+    "executor_answer": "",
+    "attempts": 3,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "A: divide(value of metavante stock awards, total purchase price), multiply(#0, 100)",
+        "predicted_answer": "2.91546",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for divide: Cannot resolve argument 'value of metavante stock awards' to a number",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: divide(value of metavante stock awards, total purchase price)\nError: Error resolving arguments for divide: Cannot resolve argument 'value of metavante stock awards' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again."
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\nA: divide(value of metavante stock awards, total purchase price), multiply(#0, 100)\nAnswer: 2.91546"
+      },
+      {
+        "attempt": 1,
+        "predicted_program": "",
+        "predicted_answer": "",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Empty program",
+          "error_type": "empty_program",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "Program is empty. Please provide a valid program."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: divide(value of metavante stock awards, total purchase price)\nError: Error resolving arguments for divide: Cannot resolve argument 'value of metavante stock awards' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again.",
+        "raw_output": "Your code here\n\nAnswer:\nYour answer here"
+      },
+      {
+        "attempt": 2,
+        "predicted_program": "divide(value_of_metavante_stock_awards, total_purchase_price), multiply(#0, 100)",
+        "predicted_answer": "2.912126530612243",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for divide: Cannot resolve argument 'value_of_metavante_stock_awards' to a number",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: divide(value_of_metavante_stock_awards, total_purchase_price)\nError: Error resolving arguments for divide: Cannot resolve argument 'value_of_metavante_stock_awards' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again."
+        },
+        "feedback": "Program is empty. Please provide a valid program.",
+        "raw_output": "Answer:\n\nYour code here:\nProgram: divide(value_of_metavante_stock_awards, total_purchase_price), multiply(#0, 100)\nAnswer: 2.912126530612243"
+      }
+    ],
+    "raw_output": "Answer:\n\nYour code here:\nProgram: divide(value_of_metavante_stock_awards, total_purchase_price), multiply(#0, 100)\nAnswer: 2.912126530612243"
+  },
+  {
+    "id": "MAS/2017/page_27.pdf-2",
+    "question": "what was the difference in percentage cumulative total shareholder return on masco common stock versus the s&p 500 index for the five year period ended 2017?",
+    "predicted_program": "subtract(#4, 206.49), divide(#0, 206.49), multiply(#1, 100)",
+    "predicted_answer": "100",
+    "gold_program": "subtract(318.46, const_100), divide(#0, const_100), subtract(206.49, const_100), divide(#2, const_100), subtract(#1, #3)",
+    "gold_answer": "1.1197",
+    "executor_success": false,
+    "executor_answer": "",
+    "attempts": 3,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "subtract(Masco_2017, S_P_500_2017), divide(#0, S_P_500_2017), multiply(#1, 100)",
+        "predicted_answer": "number",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for subtract: Cannot resolve argument 'Masco_2017' to a number",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: subtract(Masco_2017, S_P_500_2017)\nError: Error resolving arguments for subtract: Cannot resolve argument 'Masco_2017' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again."
+        },
+        "feedback": null,
+        "raw_output": "subtract(Masco_2017, S_P_500_2017), divide(#0, S_P_500_2017), multiply(#1, 100)\nAnswer: number\n\nNote: Replace Masco_2017 and S_P_500_2017 with the corresponding values from the table."
+      },
+      {
+        "attempt": 1,
+        "predicted_program": "",
+        "predicted_answer": "???",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Empty program",
+          "error_type": "empty_program",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "Program is empty. Please provide a valid program."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: subtract(Masco_2017, S_P_500_2017)\nError: Error resolving arguments for subtract: Cannot resolve argument 'Masco_2017' to a number\n\n\ud83d\udca1 Suggestion: Check that all numbers are properly formatted (no typos).\n\nPlease revise your program and try again.",
+        "raw_output": "Answer: ???"
+      },
+      {
+        "attempt": 2,
+        "predicted_program": "subtract(#4, 206.49), divide(#0, 206.49), multiply(#1, 100)",
+        "predicted_answer": "100",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for subtract: Reference #4 not found. Available: []",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: subtract(#4, 206.49)\nError: Error resolving arguments for subtract: Reference #4 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again."
+        },
+        "feedback": "Program is empty. Please provide a valid program.",
+        "raw_output": "Answer:\n\nYour code here:\nProgram: subtract(#4, 206.49), divide(#0, 206.49), multiply(#1, 100)\nsubtract(#2, 132.04), divide(#0, 132.04), multiply(#1, 100)\nsubtract(#3, 151.94), divide(#0, 151.94), multiply(#1, 100)\nsubtract(#3, 149.83), divide(#0, 149.83), multiply(#1, 100)\nsubtract(#4, 177.65), divide(#0, 177.65), multiply(#1, 100)\nadd(#1, #2), add(#1, #3), add(#1, #4), add(#1, #5)\nsubtract(#1, 100.0)\nAnswer"
+      }
+    ],
+    "raw_output": "Answer:\n\nYour code here:\nProgram: subtract(#4, 206.49), divide(#0, 206.49), multiply(#1, 100)\nsubtract(#2, 132.04), divide(#0, 132.04), multiply(#1, 100)\nsubtract(#3, 151.94), divide(#0, 151.94), multiply(#1, 100)\nsubtract(#3, 149.83), divide(#0, 149.83), multiply(#1, 100)\nsubtract(#4, 177.65), divide(#0, 177.65), multiply(#1, 100)\nadd(#1, #2), add(#1, #3), add(#1, #4), add(#1, #5)\nsubtract(#1, 100.0)\nAnswer"
+  },
+  {
+    "id": "SYY/2006/page_71.pdf-1",
+    "question": "what was the percentage change in total rental expense under operating leases from july 2 , 2005 to july 1 , 2006?",
+    "predicted_program": "the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.",
+    "predicted_answer": "100",
+    "gold_program": "subtract(92710000, 86842000), divide(#0, 86842000)",
+    "gold_answer": "0.06757",
+    "executor_success": false,
+    "executor_answer": "",
+    "attempts": 3,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "total rental expense under operating leases from July 2, 2005 to July 1, 2006, we need to find the difference between the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.",
+        "predicted_answer": "100",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "No valid operations found in: 'total rental expense under operating leases from July 2, 2005 to July 1, 2006, we need to find the difference between the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.'",
+          "error_type": "parse_error",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "\u274c Program Parsing Error:\nError: No valid operations found in: 'total rental expense under operating leases from July 2, 2005 to July 1, 2006, we need to find the difference between the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.'\n\n\ud83d\udca1 Expected format: operation(arg1, arg2), operation(arg3, arg4), ...\nExamples:\n  - subtract(750, 500)\n  - divide(#0, 500), multiply(#1, 100)\n\nPlease check your program syntax and try again."
+        },
+        "feedback": null,
+        "raw_output": "total rental expense under operating leases from July 2, 2005 to July 1, 2006, we need to find the difference between the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.\n\nSo the program would look like this:\n\n1. Subtract the rental expense in 2006 from the rental expense in 2005: subtract(92710000, 86842000) = 58668000\n2. Divide the result by the rental expense in 2005: divide"
+      },
+      {
+        "attempt": 1,
+        "predicted_program": "",
+        "predicted_answer": "",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Empty program",
+          "error_type": "empty_program",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "Program is empty. Please provide a valid program."
+        },
+        "feedback": "\u274c Program Parsing Error:\nError: No valid operations found in: 'total rental expense under operating leases from July 2, 2005 to July 1, 2006, we need to find the difference between the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.'\n\n\ud83d\udca1 Expected format: operation(arg1, arg2), operation(arg3, arg4), ...\nExamples:\n  - subtract(750, 500)\n  - divide(#0, 500), multiply(#1, 100)\n\nPlease check your program syntax and try again.",
+        "raw_output": ""
+      },
+      {
+        "attempt": 2,
+        "predicted_program": "the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.",
+        "predicted_answer": "100",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "No valid operations found in: 'the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.'",
+          "error_type": "parse_error",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "\u274c Program Parsing Error:\nError: No valid operations found in: 'the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.'\n\n\ud83d\udca1 Expected format: operation(arg1, arg2), operation(arg3, arg4), ...\nExamples:\n  - subtract(750, 500)\n  - divide(#0, 500), multiply(#1, 100)\n\nPlease check your program syntax and try again."
+        },
+        "feedback": "Program is empty. Please provide a valid program.",
+        "raw_output": "the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.\n\nSo the program would look like this:\n```vbnet\nsubtract(100690000, 86842000)   ; Find the difference between the expenses\ndivide(#0, 86842000)"
+      }
+    ],
+    "raw_output": "the expenses in those two years, divide it by the expense in the base year, and then multiply the result by 100 to get the percentage.\n\nSo the program would look like this:\n```vbnet\nsubtract(100690000, 86842000)   ; Find the difference between the expenses\ndivide(#0, 86842000)"
+  },
+  {
+    "id": "AES/2010/page_227.pdf-3",
+    "question": "what percent of total recourse debt is current?",
+    "predicted_program": "subtract(4612, 690), divide(#0, 4542), multiply(#1, 100)",
+    "predicted_answer": "86.34963",
+    "gold_program": "divide(463, 4612)",
+    "gold_answer": "0.10039",
+    "executor_success": true,
+    "executor_answer": "86.34962571554381",
+    "attempts": 1,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "subtract(4612, 690), divide(#0, 4542), multiply(#1, 100)",
+        "predicted_answer": "83.93261232830606",
+        "executor_result": {
+          "success": true,
+          "answer": 86.34962571554381,
+          "error": null,
+          "error_type": null,
+          "step_failed": null,
+          "trace": [
+            {
+              "step": 0,
+              "operation": "subtract(4612, 690)",
+              "result": 3922.0,
+              "reference": "#0"
+            },
+            {
+              "step": 1,
+              "operation": "divide(#0, 4542)",
+              "result": 0.8634962571554381,
+              "reference": "#1"
+            },
+            {
+              "step": 2,
+              "operation": "multiply(#1, 100)",
+              "result": 86.34962571554381,
+              "reference": "#2"
+            }
+          ],
+          "feedback": "\u2705 Program executed successfully"
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\n---\n\nProgram: subtract(4612, 690), divide(#0, 4542), multiply(#1, 100)\nAnswer: 83.93261232830606"
+      }
+    ],
+    "raw_output": "Answer:\n\n---\n\nProgram: subtract(4612, 690), divide(#0, 4542), multiply(#1, 100)\nAnswer: 83.93261232830606"
+  },
+  {
+    "id": "GS/2015/page_188.pdf-2",
+    "question": "what percentage of future minimum rental payments are due in 2018?",
+    "predicted_program": "divide(301, 2575), multiply(#0, 100)",
+    "predicted_answer": "11.68932",
+    "gold_program": "divide(301, 2575)",
+    "gold_answer": "0.11689",
+    "executor_success": true,
+    "executor_answer": "11.689320388349515",
+    "attempts": 1,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "divide(301, 2575), multiply(#0, 100)",
+        "predicted_answer": "11.717152433333333",
+        "executor_result": {
+          "success": true,
+          "answer": 11.689320388349515,
+          "error": null,
+          "error_type": null,
+          "step_failed": null,
+          "trace": [
+            {
+              "step": 0,
+              "operation": "divide(301, 2575)",
+              "result": 0.11689320388349514,
+              "reference": "#0"
+            },
+            {
+              "step": 1,
+              "operation": "multiply(#0, 100)",
+              "result": 11.689320388349515,
+              "reference": "#1"
+            }
+          ],
+          "feedback": "\u2705 Program executed successfully"
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\nA: The percentage of future minimum rental payments that are due in 2018 is:\nProgram: divide(301, 2575), multiply(#0, 100)\nAnswer: 11.717152433333333"
+      }
+    ],
+    "raw_output": "Answer:\n\nA: The percentage of future minimum rental payments that are due in 2018 is:\nProgram: divide(301, 2575), multiply(#0, 100)\nAnswer: 11.717152433333333"
+  },
+  {
+    "id": "MO/2016/page_19.pdf-1",
+    "question": "did altria outperform the s&p 500?",
+    "predicted_program": "subtract(#4, #1), subtract(#4, #2), subtract(#4, #3), subtract(#4, #5)",
+    "predicted_answer": "yes",
+    "gold_program": "greater(286.61, 198.09)",
+    "gold_answer": "yes",
+    "executor_success": false,
+    "executor_answer": "",
+    "attempts": 3,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "subtract(#3, #1), greater(#0, #2)",
+        "predicted_answer": "yes",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for subtract: Reference #3 not found. Available: []",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: subtract(#3, #1)\nError: Error resolving arguments for subtract: Reference #3 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again."
+        },
+        "feedback": null,
+        "raw_output": "subtract(#3, #1), greater(#0, #2)\n\nAnswer: yes"
+      },
+      {
+        "attempt": 1,
+        "predicted_program": "subtract(#3, #1), subtract(#3, #2), greater(#0, #2), greater(#0, #4)",
+        "predicted_answer": "yes",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for subtract: Reference #3 not found. Available: []",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: subtract(#3, #1)\nError: Error resolving arguments for subtract: Reference #3 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: subtract(#3, #1)\nError: Error resolving arguments for subtract: Reference #3 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again.",
+        "raw_output": "subtract(#3, #1), subtract(#3, #2), greater(#0, #2), greater(#0, #4)\n\nAnswer: yes"
+      },
+      {
+        "attempt": 2,
+        "predicted_program": "subtract(#4, #1), subtract(#4, #2), subtract(#4, #3), subtract(#4, #5)",
+        "predicted_answer": "yes",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for subtract: Reference #4 not found. Available: []",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: subtract(#4, #1)\nError: Error resolving arguments for subtract: Reference #4 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: subtract(#3, #1)\nError: Error resolving arguments for subtract: Reference #3 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again.",
+        "raw_output": "subtract(#4, #1), subtract(#4, #2), subtract(#4, #3), subtract(#4, #5)\ngreater(#0, #6)\n\nAnswer: yes"
+      }
+    ],
+    "raw_output": "subtract(#4, #1), subtract(#4, #2), subtract(#4, #3), subtract(#4, #5)\ngreater(#0, #6)\n\nAnswer: yes"
+  },
+  {
+    "id": "CMCSA/2015/page_112.pdf-2",
+    "question": "what was the change in unrecognized tax benefits from the end of 2014 to the end of 2015?",
+    "predicted_program": "",
+    "predicted_answer": "",
+    "gold_program": "subtract(1136, 1171)",
+    "gold_answer": "-35.0",
+    "executor_success": false,
+    "executor_answer": "",
+    "attempts": 3,
+    "attempt_history": [
+      {
+        "attempt": 0,
+        "predicted_program": "subtract(#0, 111), subtract(#0, 201), subtract(#0, 268), add(subtract(#0, 84), subtract(#0, 220)), subtract(#0, 448), subtract(#0, 3), subtract(#0, 287), add(subtract(#0, 75), subtract(#0, 36))",
+        "predicted_answer": "-544.0",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Error resolving arguments for subtract: Reference #0 not found. Available: []",
+          "error_type": "execution_error",
+          "step_failed": 0,
+          "trace": [],
+          "feedback": "\u274c Error at step 1:\nOperation: subtract(#0, 111)\nError: Error resolving arguments for subtract: Reference #0 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again."
+        },
+        "feedback": null,
+        "raw_output": "Answer:\n\nA: The change in unrecognized tax benefits from the end of 2014 to the end of 2015 was a reduction of $ 135 million.\n\nProgram: subtract(1171, 1136), subtract(#0, 1701)\nAnswer: -165.0\n\nB: However, this figure includes additions and reductions that are not related to the change in unrecognized tax benefits. We need to isolate the reductions specifically related to unrecognized tax benefits.\n\nProgram: subtract(#0, 111), subtract(#0, 201), subtract(#0, 268), add(subtract(#0, 84), subtract(#0, 220)), subtract(#0, 448), subtract(#0, 3), subtract(#0, 287), add(subtract(#0, 75), subtract(#0, 36))\nAnswer: -544.0\n\nC:"
+      },
+      {
+        "attempt": 1,
+        "predicted_program": "subtract",
+        "predicted_answer": "-319.0",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "No valid operations found in: 'subtract'",
+          "error_type": "parse_error",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "\u274c Program Parsing Error:\nError: No valid operations found in: 'subtract'\n\n\ud83d\udca1 Expected format: operation(arg1, arg2), operation(arg3, arg4), ...\nExamples:\n  - subtract(750, 500)\n  - divide(#0, 500), multiply(#1, 100)\n\nPlease check your program syntax and try again."
+        },
+        "feedback": "\u274c Error at step 1:\nOperation: subtract(#0, 111)\nError: Error resolving arguments for subtract: Reference #0 not found. Available: []\n\n\ud83d\udca1 Suggestion: Make sure you're referencing results from previous steps correctly.\nAvailable references: []\n\nPlease revise your program and try again.",
+        "raw_output": "Answer:\n\n---\n\nProgram: subtract(1136, 1171), add(#0, 67), add(#0, 98), add(#0, 201), subtract(#0, 84), subtract(#0, 448), subtract(#0, 3), subtract(1171, 1701), add(#1, 63), add(#1, 201), subtract(#1, 141), subtract(#1, 3), subtract(1701, 1573), add(#2, 90), add(#2, 268), subtract(#2, 141), subtract(#2, 287), add(510), subtract(510, 452), subtract(#0, 49), add(#1, 44), subtract(#1, 44)\nAnswer: -319.0\n\n---\n\nProgram: subtract"
+      },
+      {
+        "attempt": 2,
+        "predicted_program": "",
+        "predicted_answer": "",
+        "executor_result": {
+          "success": false,
+          "answer": null,
+          "error": "Empty program",
+          "error_type": "empty_program",
+          "step_failed": null,
+          "trace": [],
+          "feedback": "Program is empty. Please provide a valid program."
+        },
+        "feedback": "\u274c Program Parsing Error:\nError: No valid operations found in: 'subtract'\n\n\ud83d\udca1 Expected format: operation(arg1, arg2), operation(arg3, arg4), ...\nExamples:\n  - subtract(750, 500)\n  - divide(#0, 500), multiply(#1, 100)\n\nPlease check your program syntax and try again.",
+        "raw_output": "Answer:"
+      }
+    ],
+    "raw_output": "Answer:"
+  }
+]

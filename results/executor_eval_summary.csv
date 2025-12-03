@@ -1,0 +1,10 @@
+Metric,Count,Percentage
+Total Predictions,10,
+Program Correct,0,0.00%
+Answer Correct,0,0.00%
+Executor Success,4,40.00%
+,,
+Retry Distribution,,
+1 attempts,4,40.00%
+2 attempts,0,0.00%
+3 attempts,6,60.00%
