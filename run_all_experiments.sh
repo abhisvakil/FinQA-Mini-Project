@@ -216,15 +216,15 @@ case "$1" in
         train_qlora_llama
         train_qlora_mistral
         echo -e "${GREEN}✓✓✓ All training complete!${NC}"
+        ;;
+    
     # Inference
     infer-lora-llama) infer_lora_llama ;;
     infer-lora-mistral) infer_lora_mistral ;;
     infer-qlora-llama) infer_qlora_llama ;;
     infer-qlora-mistral) infer_qlora_mistral ;;
     infer-icl-llama) infer_icl_llama "$2" ;;
-    infer-icl-mistral) infer_icl_mistral "$2" ;;l ;;
-    infer-icl-llama) infer_icl_llama ;;
-    infer-icl-mistral) infer_icl_mistral ;;
+    infer-icl-mistral) infer_icl_mistral "$2" ;;
     
     infer-all)
         echo -e "${BLUE}Running all inference (will take 2-3 hours)${NC}\n"
