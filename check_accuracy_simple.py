@@ -11,19 +11,11 @@ all_ops = ["add", "subtract", "multiply", "divide", "exp", "greater", "table_max
 
 def program_tokenization(original_program):
     """Convert program string to token list"""
-    # Split on ", " only between operations (not within parentheses)
-    # Simple approach: split on "), " to separate steps
-    if '), ' in original_program:
-        steps = original_program.split('), ')
-        # Add back the closing paren except for last step
-        steps = [s + ')' if i < len(steps) - 1 else s for i, s in enumerate(steps)]
-    else:
-        steps = [original_program]
-    
+    original_program = original_program.split(', ')
     program = []
-    for step in steps:
+    for tok in original_program:
         cur_tok = ''
-        for c in step:
+        for c in tok:
             if c == ')':
                 if cur_tok != '':
                     program.append(cur_tok)
@@ -35,10 +27,6 @@ def program_tokenization(original_program):
                     cur_tok = ''
                 program.append(c)
             elif c == ' ':
-                if cur_tok != '':
-                    program.append(cur_tok)
-                    cur_tok = ''
-            elif c == ',':
                 if cur_tok != '':
                     program.append(cur_tok)
                     cur_tok = ''
@@ -56,10 +44,6 @@ def equal_program(program1, program2):
     program1: gold (string)
     program2: pred (string)
     """
-    # Quick check: if strings are identical, return True immediately
-    if program1 == program2:
-        return True
-    
     try:
         # Tokenize both programs
         prog1_tokens = program_tokenization(program1)
@@ -193,13 +177,9 @@ def equal_program(program1, program2):
         
         # Derive symbolic expressions
         steps1 = program1_str.split(")")[:-1]
-        if not steps1:
-            return False
         sym_prog1 = symbol_recur(steps1[-1], step_dict_1)
         
         steps2 = program2_str.split(")")[:-1]
-        if not steps2:
-            return False
         sym_prog2 = symbol_recur(steps2[-1], step_dict_2)
         
         # For boolean operations (greater/less), compare strings directly
@@ -213,7 +193,7 @@ def equal_program(program1, program2):
         
     except Exception as e:
         # If any error in symbolic comparison, fall back to False
-        # Debug: Uncomment below to see errors
+        # Uncomment below for debugging:
         # print(f"ERROR in equal_program: {e}")
         # import traceback; traceback.print_exc()
         return False
