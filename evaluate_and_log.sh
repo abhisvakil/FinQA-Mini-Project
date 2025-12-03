@@ -1,19 +1,34 @@
 #!/bin/bash
 # Wrapper script to run check_accuracy_simple.py and log results to CSV
 
-# Usage: ./evaluate_and_log.sh <predictions_file> <model_name> <config_name> <num_shots>
-# Example: ./evaluate_and_log.sh results/icl_config_1/Mistral-7B-Instruct-v0.2_icl_predictions_latest.json Mistral-7B-Instruct-v0.2 config_1 5
+# Usage: ./evaluate_and_log.sh <model_name> <config_name> <num_shots>
+# Example: ./evaluate_and_log.sh Mistral-7B-Instruct-v0.2 config_1 5
 
-if [ "$#" -lt 4 ]; then
-    echo "Usage: $0 <predictions_file> <model_name> <config_name> <num_shots>"
-    echo "Example: $0 results_test/Mistral-7B-Instruct-v0.2_icl_predictions_latest.json Mistral-7B-Instruct-v0.2 config_1 5"
+if [ "$#" -lt 3 ]; then
+    echo "Usage: $0 <model_name> <config_name> <num_shots>"
+    echo "Example: $0 Mistral-7B-Instruct-v0.2 config_1 5"
+    echo ""
+    echo "Script will look for predictions in: results/icl_<config_name>/<model_name>_icl_predictions_latest.json"
     exit 1
 fi
 
-PREDICTIONS_FILE="$1"
-MODEL_NAME="$2"
-CONFIG_NAME="$3"
-NUM_SHOTS="$4"
+MODEL_NAME="$1"
+CONFIG_NAME="$2"
+NUM_SHOTS="$3"
+
+# Construct predictions file path from results folder
+# Path format: results/icl_config_X/model_name_icl_predictions_latest.json
+PREDICTIONS_FILE="results/icl_${CONFIG_NAME}/${MODEL_NAME}_icl_predictions_latest.json"
+
+# Check if file exists
+if [ ! -f "$PREDICTIONS_FILE" ]; then
+    echo "Error: Predictions file not found: $PREDICTIONS_FILE"
+    echo ""
+    echo "Looking in results/ directory..."
+    echo "Available predictions:"
+    find results -name "*_icl_predictions_latest.json" 2>/dev/null
+    exit 1
+fi
 
 # CSV file to store results
 CSV_FILE="evaluation_results.csv"
