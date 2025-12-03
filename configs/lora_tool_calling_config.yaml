@@ -1,0 +1,38 @@
+# LangChain Tool Calling Configuration for LoRA Models
+
+model:
+  model_name_or_path: "meta-llama/Meta-Llama-3-8B-Instruct"  # or "mistralai/Mistral-7B-Instruct-v0.2"
+  adapter_path: "results/lora/Meta-Llama-3-8B-Instruct/final_model"  # Path to LoRA adapters
+  torch_dtype: "bfloat16"
+  device_map: "auto"
+  load_in_8bit: false
+
+agent:
+  agent_type: "STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION"
+  max_iterations: 10
+  verbose: true
+  early_stopping_method: "generate"
+
+generation:
+  max_new_tokens: 256
+  temperature: 0.2
+  do_sample: true
+  top_p: 0.95
+
+data:
+  data_dir: "data/simplified"
+  test_file: "test_simplified.json"
+  output_dir: "results/predictions"
+  max_samples: 20  # Set to number for quick testing (e.g., 10)
+
+tools:
+  enabled_tools:
+    - add
+    - subtract
+    - multiply
+    - divide
+    - greater
+    - exp
+    - table_access
+    - const
+
