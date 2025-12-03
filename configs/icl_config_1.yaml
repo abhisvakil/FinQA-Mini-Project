@@ -19,8 +19,7 @@ generation:
 
 # ICL Configuration
 icl:
-  num_shots: 5  # Number of few-shot examples (try 3, 5, 10)
-  example_selection: "random"  # "diverse", "random", or "similarity-based"
+  example_selection: "diverse"  # "diverse", "random", or "similarity-based"
   
 # System Prompt
 system_prompt: |

@@ -16,7 +16,6 @@ generation:
   repetition_penalty: 1.2
 
 icl:
-  num_shots: 5
   example_selection: "diverse"
 
 # SYSTEM PROMPT - Conversational, encouraging style (different from config_1's formal tone)

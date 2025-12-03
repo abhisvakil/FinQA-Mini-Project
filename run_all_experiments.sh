@@ -180,7 +180,8 @@ function infer_qlora_mistral() {
 
 function infer_icl_llama() {
     local config="${1:-config_1}"  # Default to config_1 if not specified
-    echo -e "${YELLOW}[INFER] ICL Llama with ${config}...${NC}"
+    local num_shots="${2:-5}"  # Default to 5 shots if not specified
+    echo -e "${YELLOW}[INFER] ICL Llama with ${config} (${num_shots}-shot)...${NC}"
     cd src
     # Use stdbuf to unbuffer output for nohup
     stdbuf -oL -eL python -u icl_inference.py \
@@ -188,14 +189,15 @@ function infer_icl_llama() {
         --model_name "$LLAMA_MODEL" \
         --data_dir "../$DATA_DIR" \
         --output_dir "../$PRED_DIR" \
-        ${NUM_SAMPLES:+--max_samples $NUM_SAMPLES}
+        --num_shots "$num_shots" 
     cd ..
     echo -e "${YELLOW}✓ ICL Llama inference complete${NC}\n"
 }
 
 function infer_icl_mistral() {
     local config="${1:-config_2}"  # Default to config_2 if not specified
-    echo -e "${YELLOW}[INFER] ICL Mistral with ${config}...${NC}"
+    local num_shots="${2:-5}"  # Default to 5 shots if not specified
+    echo -e "${YELLOW}[INFER] ICL Mistral with ${config} (${num_shots}-shot)...${NC}"
     cd src
     # Use stdbuf to unbuffer output for nohup
     stdbuf -oL -eL python -u icl_inference.py \
@@ -203,6 +205,7 @@ function infer_icl_mistral() {
         --model_name "$MISTRAL_MODEL" \
         --data_dir "../$DATA_DIR" \
         --output_dir "../$PRED_DIR" \
+        --num_shots "$num_shots" \
         ${NUM_SAMPLES:+--max_samples $NUM_SAMPLES}
     cd ..
     echo -e "${YELLOW}✓ ICL Mistral inference complete${NC}\n"
@@ -230,8 +233,8 @@ case "$1" in
     infer-lora-mistral) infer_lora_mistral ;;
     infer-qlora-llama) infer_qlora_llama ;;
     infer-qlora-mistral) infer_qlora_mistral ;;
-    infer-icl-llama) infer_icl_llama "$2" ;;
-    infer-icl-mistral) infer_icl_mistral "$2" ;;
+    infer-icl-llama) infer_icl_llama "$2" "$3" ;;
+    infer-icl-mistral) infer_icl_mistral "$2" "$3" ;;
     
     infer-all)
         echo -e "${BLUE}Running all inference (will take 2-3 hours)${NC}\n"

@@ -286,6 +286,10 @@ def run_inference(model, tokenizer, test_data: List[Dict], config: dict) -> List
     )
     
     for example in pbar:
+        # Clear CUDA cache periodically to prevent fragmentation
+        if len(predictions) % 10 == 0:
+            torch.cuda.empty_cache()
+        
         # Create prompt using config template
         prompt = create_prompt_from_config(config, example)
         
@@ -312,6 +316,9 @@ def run_inference(model, tokenizer, test_data: List[Dict], config: dict) -> List
             outputs[0][inputs['input_ids'].shape[1]:],
             skip_special_tokens=True
         )
+        
+        # Free memory immediately
+        del inputs, outputs
         
         # Parse output
         program, answer = parse_model_output(generated_text)
@@ -344,6 +351,8 @@ def main():
                         help="Max test samples (for quick testing)")
     parser.add_argument("--temperature", type=float, default=None,
                         help="Override temperature from config")
+    parser.add_argument("--num_shots", type=int, default=5,
+                        help="Number of few-shot examples (e.g., 0, 3, 5, 10)")
     
     args = parser.parse_args()
     
@@ -380,7 +389,8 @@ def main():
         model_name,
         torch_dtype=getattr(torch, config['model'].get('torch_dtype', 'bfloat16')),
         device_map=config['model'].get('device_map', 'auto'),
-        load_in_8bit=config['model'].get('load_in_8bit', False),
+        load_in_8bit=True,  # Force 8-bit to save memory
+        max_memory={0: "20GiB"},  # Limit GPU 0 memory usage
         trust_remote_code=True
     )
     model.eval()
@@ -404,7 +414,7 @@ def main():
     
     # Select and format few-shot examples
     print(f"\n[3/5] Selecting and formatting few-shot examples...", flush=True)
-    num_shots = config['icl']['num_shots']
+    num_shots = args.num_shots
     selection_method = config['icl'].get('example_selection', 'diverse')
     few_shot_examples = select_few_shot_examples(train_data, num_shots, selection_method)
     
