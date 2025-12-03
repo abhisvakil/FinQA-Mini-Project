@@ -1,0 +1,92 @@
+# ICL with Enhanced Executor Configuration for FinQA
+# Optimized for A100 GPU
+
+model:
+  model_name_or_path: "mistralai/Mistral-7B-Instruct-v0.2"
+  torch_dtype: "bfloat16"  # Use BF16 for A100
+  device_map: "auto"  # Automatically use GPU
+  load_in_8bit: false
+
+generation:
+  max_new_tokens: 256
+  temperature: 0.1
+  top_p: 0.95
+  top_k: 50
+  do_sample: true
+  num_beams: 1
+  repetition_penalty: 1.1
+
+# Executor configuration
+executor:
+  enabled: true
+  max_retries: 2  # Allow up to 2 retries (3 total attempts)
+  validate_results: true
+  provide_feedback: true
+  
+  # Only retry on specific error types
+  retry_on_errors:
+    - "parse_error"
+    - "execution_error"
+    - "validation_warning"
+  
+  # Skip retry for these
+  skip_retry_on:
+    - "empty_program"
+
+# System prompt with clear instructions
+system_prompt: |
+  You are an expert financial analyst. Given a question and financial data (tables and text), 
+  generate a reasoning program to calculate the answer step-by-step.
+  
+  Available operations:
+    - add(a, b): Add two numbers
+    - subtract(a, b): Subtract b from a
+    - multiply(a, b): Multiply two numbers
+    - divide(a, b): Divide a by b
+    - greater(a, b): Return the greater of two numbers
+    - exp(a, b): Calculate a raised to the power b
+    - const_100, const_2, const_3, etc.: Use constants
+  
+  Rules:
+    1. Use actual numbers from the data (e.g., 750, 500)
+    2. For multi-step calculations, separate operations with commas
+    3. Reference previous results as #0, #1, #2, etc.
+    4. Always provide both Program AND Answer
+  
+  Format your response EXACTLY like this:
+    Program: your_program_here
+    Answer: your_numeric_answer
+  
+  Example:
+    Question: What is the percentage change from 500 to 750?
+    Program: subtract(750, 500), divide(#0, 500), multiply(#1, 100)
+    Answer: 50.0
+
+# Prompt template
+prompt_template: |
+  {system_prompt}
+  
+  {few_shot_examples}
+  
+  Now solve this question:
+  
+  Question: {question}
+  
+  Context:
+  {context}
+  
+  Program:
+
+# Data configuration
+data:
+  test_file: "src/data/test.json"
+  output_file: "results/icl_executor_predictions.json"
+  max_samples: 10  # Start with 10 for testing, set to null for all
+
+# Inference settings
+inference:
+  batch_size: 1  # Process one at a time for now (can increase for batching)
+  use_cache: true
+  save_intermediate: true
+  log_attempts: true  # Log all retry attempts
+
