@@ -171,17 +171,25 @@ def equal_program(program1, program2):
                 return "( " + arg1_part + " ** " + arg2_part + " )"
             elif op == "greater":
                 return "( " + arg1_part + " > " + arg2_part + " )"
+            elif op == "less":
+                return "( " + arg1_part + " < " + arg2_part + " )"
+            return ""
         
         # Derive symbolic expressions
         steps1 = program1_str.split(")")[:-1]
         sym_prog1 = symbol_recur(steps1[-1], step_dict_1)
-        sym_prog1 = simplify(sym_prog1, evaluate=False)
         
         steps2 = program2_str.split(")")[:-1]
         sym_prog2 = symbol_recur(steps2[-1], step_dict_2)
-        sym_prog2 = simplify(sym_prog2, evaluate=False)
         
-        return sym_prog1 == sym_prog2
+        # For boolean operations (greater/less), compare strings directly
+        # For arithmetic operations, use sympy simplify
+        if ">" in sym_prog1 or ">" in sym_prog2 or "<" in sym_prog1 or "<" in sym_prog2:
+            return sym_prog1 == sym_prog2
+        else:
+            sym_prog1 = simplify(sym_prog1, evaluate=False)
+            sym_prog2 = simplify(sym_prog2, evaluate=False)
+            return sym_prog1 == sym_prog2
         
     except Exception as e:
         # If any error in symbolic comparison, fall back to False
