@@ -31,26 +31,32 @@ def extract_program_and_answer(text: str):
     for line in lines:
         line_lower = line.lower().strip()
         if line_lower.startswith('program:'):
+            # Explicit Program: line – strip label, keep the rest
             program = line.split(':', 1)[1].strip()
         elif line_lower.startswith('answer:'):
+            # Explicit Answer: line – strip label, keep the rest
             answer = line.split(':', 1)[1].strip()
     
-    # If not found in structured format, try to extract
+    # If not found in structured format, try to extract a clean program
     if not program:
-        # Look for operation patterns
-        for line in lines:
-            if any(op in line for op in ['add', 'subtract', 'multiply', 'divide', 'greater', 'exp']):
-                # Extract everything that looks like operations
-                program = line.strip()
-                break
+        # Collect all operations of the form op(arg1, arg2) from the entire text
+        allowed_ops = {"add", "subtract", "multiply", "divide", "greater", "exp"}
+        matches = re.findall(r'([a-z_]+)\s*\(([^)]+)\)', text)
+        op_strings = []
+        for op_name, args_str in matches:
+            if op_name in allowed_ops:
+                op_strings.append(f"{op_name}({args_str})")
+        if op_strings:
+            # Join multiple operations into a single program string
+            program = ", ".join(op_strings)
     
     if not answer:
-        # Try to find numbers
+        # Try to find a numeric answer in the text (last number heuristic)
         for line in lines:
             numbers = re.findall(r'-?\d+\.?\d*', line)
             if numbers:
                 answer = numbers[-1]
-                break
+        # Note: we intentionally do NOT break on first number; we want the last one
     
     return program, answer
 
