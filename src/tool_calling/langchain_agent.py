@@ -180,17 +180,14 @@ def create_finqa_agent_with_lora(
         raise ImportError("LangChain classic API not available. Please install langchain<0.1")
     
     # Ensure agent is AgentExecutor and has return_intermediate_steps enabled
-    if not isinstance(agent, AgentExecutor):
-        # Wrap if needed
+    # Note: initialize_agent already returns AgentExecutor, so this check is mainly for safety
+    try:
         from langchain.agents import AgentExecutor
-        if hasattr(agent, 'agent') and hasattr(agent, 'tools'):
-            agent = AgentExecutor(
-                agent=agent.agent,
-                tools=agent.tools,
-                verbose=verbose,
-                return_intermediate_steps=True,
-                max_iterations=max_iterations
-            )
+        if not isinstance(agent, AgentExecutor):
+            # This shouldn't happen with initialize_agent, but handle it if it does
+            print("Warning: Agent is not AgentExecutor, but should be from initialize_agent")
+    except ImportError:
+        pass  # AgentExecutor not available
     
     print("Agent created successfully!")
     return agent, model, tokenizer
