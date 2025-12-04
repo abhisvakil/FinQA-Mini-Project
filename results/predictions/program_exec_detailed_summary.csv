@@ -1,0 +1,5 @@
+model,total_predictions,program_matches,base_correct_progmatch,base_wrong_progmatch,tool_fixed_progmatch,remaining_wrong_progmatch,base_subset_acc_pct,tool_subset_acc_pct,absolute_gain_pct
+Meta-Llama-3-8B-Instruct,1147,460,352,108,104,4,76.52,99.13,22.61
+Mistral-7B-Instruct-v0.2,1147,309,218,91,87,4,70.55,98.71,28.16
+
+

@@ -1,0 +1,5 @@
+model,total_predictions,program_matches,executed_on_matches,executed_answer_matches,answer_accuracy_within_matching_pct
+Mistral-7B-Instruct-v0.2-LoRA,1147,309,304,302,97.73
+Meta-Llama-3-8B-Instruct-LoRA,1147,460,447,446,96.96
+
+
