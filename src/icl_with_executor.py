@@ -114,6 +114,59 @@ def create_prompt(config, question, context_data, feedback=None):
     return prompt
 
 
+def build_format_issues(generated_answer: str, predicted_program: str, predicted_answer: str):
+    """
+    Inspect the raw model output and the extracted program/answer
+    to detect common formatting / rule violations.
+    """
+    issues = []
+
+    lines = [ln.strip() for ln in generated_answer.split("\n") if ln.strip()]
+    has_program_label = any(ln.lower().startswith("program:") for ln in lines)
+    has_answer_label = any(ln.lower().startswith("answer:") for ln in lines)
+
+    # Missing Program line or empty program
+    if not has_program_label or not predicted_program:
+        issues.append(
+            "No valid 'Program:' line with operations was detected. "
+            "You MUST output a line starting with 'Program:' followed by one or more operations "
+            "using ONLY: add, subtract, multiply, divide, greater, exp."
+        )
+
+    # Check allowed operations if a program exists
+    if predicted_program:
+        # Extract operation names before the first '('
+        ops = re.findall(r'([a-z_]+)\s*\(', predicted_program)
+        allowed_ops = {"add", "subtract", "multiply", "divide", "greater", "exp"}
+        bad_ops = sorted({op for op in ops if op not in allowed_ops})
+        if bad_ops:
+            issues.append(
+                "Your program uses invalid operations: "
+                + ", ".join(bad_ops)
+                + ". Use ONLY: add, subtract, multiply, divide, greater, exp."
+            )
+
+    # Missing Answer line or non‑numeric answer
+    if not has_answer_label or not predicted_answer:
+        issues.append(
+            "No valid 'Answer:' line with a numeric value was detected. "
+            "You MUST output a line like: 'Answer: 123.45' with a single final number."
+        )
+    else:
+        # Try to interpret the predicted_answer as a number
+        cleaned = predicted_answer.replace(",", "").replace("$", "").replace("%", "").strip()
+        cleaned = cleaned.replace(" ", "")
+        try:
+            float(cleaned)
+        except ValueError:
+            issues.append(
+                f"The Answer you provided ('{predicted_answer}') is not a plain numeric value. "
+                "The 'Answer:' line must contain a single number (no text, units, or explanations)."
+            )
+
+    return issues
+
+
 def process_single_sample(sample, model, tokenizer, config, executor_config):
     """
     Process a single sample with executor and retry logic.
@@ -178,8 +231,11 @@ def process_single_sample(sample, model, tokenizer, config, executor_config):
         
         # Extract program and answer
         predicted_program, predicted_answer = extract_program_and_answer(generated_answer)
-        
-        # Execute program
+
+        # Build high‑level format / rule violations (used for feedback on retries)
+        format_issues = build_format_issues(generated_answer, predicted_program, predicted_answer)
+
+        # Execute program (even if format issues exist, to capture detailed execution feedback)
         exec_result = executor.execute(predicted_program)
         
         # Store attempt
@@ -189,7 +245,8 @@ def process_single_sample(sample, model, tokenizer, config, executor_config):
             'predicted_answer': predicted_answer,
             'executor_result': exec_result,
             'feedback': feedback,
-            'raw_output': generated_answer
+            'raw_output': generated_answer,
+            'format_issues': format_issues,
         }
         attempt_history.append(attempt_info)
         
@@ -206,15 +263,35 @@ def process_single_sample(sample, model, tokenizer, config, executor_config):
                 # Success or out of retries
                 break
             else:
-                # Warnings found, provide feedback for retry
-                feedback = "⚠️ Program executed but result seems unusual:\n"
-                feedback += "\n".join(warnings)
-                feedback += "\n\nPlease review your logic and revise the program."
+                # Warnings found, provide feedback for retry (include validation + format hints)
+                feedback_parts = []
+                if warnings:
+                    feedback_parts.append("⚠️ Program executed but the numeric result seems unusual:\n" + "\n".join(warnings))
+                if format_issues:
+                    feedback_parts.append(
+                        "⚠️ There are also formatting / rule issues with your previous answer:\n"
+                        + "\n".join(f"- {msg}" for msg in format_issues)
+                    )
+                if not feedback_parts:
+                    # Fallback generic message
+                    feedback_parts.append("Please carefully re-check your program and answer formatting.")
+                feedback = "\n\n".join(feedback_parts)
         else:
             # Execution failed
             if attempt < max_retries:
-                # Provide feedback for retry
-                feedback = exec_result['feedback']
+                # Provide detailed feedback for retry, combining executor feedback + format issues
+                feedback_parts = []
+                if exec_result.get('feedback'):
+                    feedback_parts.append("Executor error summary:\n" + exec_result['feedback'])
+                if format_issues:
+                    feedback_parts.append(
+                        "Additional issues with your previous response:\n"
+                        + "\n".join(f"- {msg}" for msg in format_issues)
+                    )
+                if not feedback_parts:
+                    feedback_parts.append("Your previous answer could not be executed. Please follow the Program/Answer format strictly.")
+
+                feedback = "\n\n".join(feedback_parts)
             else:
                 # Out of retries
                 break
