@@ -147,32 +147,32 @@ def create_finqa_agent_with_lora(
     print("Creating LangChain agent...")
     
     if initialize_agent is not None and AgentType is not None:
-        # Use classic API
+        # Use classic API - try STRUCTURED_CHAT first (better for structured tools)
         try:
             agent = initialize_agent(
                 tools=tools,
                 llm=llm,
-                agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,  # Use simpler agent type
+                agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
                 verbose=verbose,
                 return_intermediate_steps=True,
                 max_iterations=max_iterations,
                 early_stopping_method="generate"
             )
         except Exception as e:
-            print(f"Error with ZERO_SHOT_REACT_DESCRIPTION: {e}")
-            # Try with STRUCTURED_CHAT if available
+            print(f"Error with STRUCTURED_CHAT: {e}")
+            # Fallback to ZERO_SHOT_REACT_DESCRIPTION
             try:
                 agent = initialize_agent(
                     tools=tools,
                     llm=llm,
-                    agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+                    agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
                     verbose=verbose,
                     return_intermediate_steps=True,
                     max_iterations=max_iterations,
                     early_stopping_method="generate"
                 )
             except Exception as e2:
-                print(f"Error with STRUCTURED_CHAT: {e2}")
+                print(f"Error with ZERO_SHOT_REACT_DESCRIPTION: {e2}")
                 raise
     else:
         raise ImportError("LangChain classic API not available. Please install langchain<0.1")

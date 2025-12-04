@@ -69,6 +69,15 @@ def extract_answer_from_agent_output(output: str) -> str:
     """
     import re
     
+    # Clean up spacing issues first
+    # Fix patterns like "a d d" -> "add", "s u b t r a c t" -> "subtract"
+    output = re.sub(r'\ba\s+d\s+d\b', 'add', output)
+    output = re.sub(r'\bs\s+u\s+b\s+t\s+r\s+a\s+c\s+t\b', 'subtract', output)
+    output = re.sub(r'\bm\s+u\s+l\s+t\s+i\s+p\s+l\s+y\b', 'multiply', output)
+    output = re.sub(r'\bd\s+i\s+v\s+i\s+d\s+e\b', 'divide', output)
+    output = re.sub(r'\bg\s+r\s+e\s+a\s+t\s+e\s+r\b', 'greater', output)
+    output = re.sub(r'\be\s+x\s+p\b', 'exp', output)
+    
     # Look for "Answer:" marker
     answer_match = re.search(r'Answer:\s*([^\n]+)', output, re.IGNORECASE)
     if answer_match:
@@ -78,6 +87,26 @@ def extract_answer_from_agent_output(output: str) -> str:
         # Remove trailing punctuation
         answer = answer.rstrip('.,;:!?%')
         return answer
+    
+    # Look for "Final Answer:" marker
+    final_answer_match = re.search(r'Final\s+Answer:\s*([^\n]+)', output, re.IGNORECASE)
+    if final_answer_match:
+        answer = final_answer_match.group(1).strip()
+        answer = answer.split('This')[0].split('Therefore')[0].split('So')[0].strip()
+        answer = answer.rstrip('.,;:!?%')
+        return answer
+    
+    # Look for numbers after "Observation:" (tool results)
+    observation_pattern = r'Observation:\s*([^\n]+)'
+    observations = re.findall(observation_pattern, output, re.IGNORECASE)
+    if observations:
+        # Take the last observation (usually the final result)
+        last_obs = observations[-1].strip()
+        # Extract number from observation
+        number_pattern = r'\b(-?\d+\.?\d*(?:e[+-]?\d+)?)\b'
+        numbers = re.findall(number_pattern, last_obs)
+        if numbers:
+            return numbers[-1]
     
     # Look for standalone numbers at the end
     number_pattern = r'\b(-?\d+\.?\d*(?:e[+-]?\d+)?)\b'
@@ -119,7 +148,19 @@ Context:
 
 Question: {question}
 
-Use the tools to calculate the answer step by step. When you have the final answer, provide it clearly with "Answer: <value>".
+Use the tools to calculate the answer step by step. When you have the final answer, provide it clearly with "Final Answer: <value>".
+
+Available tools:
+- add(a, b): Add two numbers
+- subtract(a, b): Subtract two numbers  
+- multiply(a, b): Multiply two numbers
+- divide(a, b): Divide two numbers
+- greater(a, b): Return the greater value
+- exp(a, b): Raise a to power b
+- const(value): Use a constant value
+- table_access(row, col): Access table cell
+
+Format your tool calls as: Tool: tool_name, Arguments: a=value1, b=value2
 """
     
     # Update executor with this sample's table
@@ -128,7 +169,6 @@ Use the tools to calculate the answer step by step. When you have the final answ
     
     try:
         # Run agent with intermediate steps
-        # Use invoke instead of run to get structured output
         from langchain.agents import AgentExecutor
         
         if isinstance(agent, AgentExecutor):
@@ -137,12 +177,29 @@ Use the tools to calculate the answer step by step. When you have the final answ
             result = response.get("output", "")
             intermediate_steps = response.get("intermediate_steps", [])
         else:
-            # Fallback to run
+            # Fallback to run - try to get intermediate steps from agent
             result = agent.run(prompt)
+            # Try to extract intermediate steps from agent if available
             intermediate_steps = []
+            if hasattr(agent, 'agent_executor'):
+                if hasattr(agent.agent_executor, 'intermediate_steps'):
+                    intermediate_steps = agent.agent_executor.intermediate_steps
+            elif hasattr(agent, 'intermediate_steps'):
+                intermediate_steps = agent.intermediate_steps
         
-        # Extract answer
-        predicted_answer = extract_answer_from_agent_output(str(result))
+        # Extract answer - clean up the result first
+        result_str = str(result)
+        # Remove spaces between characters in tool calls (fix formatting issue)
+        import re
+        # Fix patterns like "a d d" -> "add", "s u b t r a c t" -> "subtract"
+        result_str = re.sub(r'\ba\s+d\s+d\b', 'add', result_str)
+        result_str = re.sub(r'\bs\s+u\s+b\s+t\s+r\s+a\s+c\s+t\b', 'subtract', result_str)
+        result_str = re.sub(r'\bm\s+u\s+l\s+t\s+i\s+p\s+l\s+y\b', 'multiply', result_str)
+        result_str = re.sub(r'\bd\s+i\s+v\s+i\s+d\s+e\b', 'divide', result_str)
+        result_str = re.sub(r'\bg\s+r\s+e\s+a\s+t\s+e\s+r\b', 'greater', result_str)
+        result_str = re.sub(r'\be\s+x\s+p\b', 'exp', result_str)
+        
+        predicted_answer = extract_answer_from_agent_output(result_str)
         
         return {
             'id': sample.get('id', ''),
@@ -151,7 +208,7 @@ Use the tools to calculate the answer step by step. When you have the final answ
             'gold_program': ' '.join(gold_program) if isinstance(gold_program, list) else gold_program,
             'gold_answer': gold_answer,
             'tool_calls': len(intermediate_steps),
-            'raw_output': str(result),
+            'raw_output': result_str,
             'intermediate_steps': str(intermediate_steps) if intermediate_steps else ''
         }
     except Exception as e:
