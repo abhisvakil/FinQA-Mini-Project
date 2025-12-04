@@ -158,6 +158,7 @@ def create_finqa_agent_with_lora(
                 max_iterations=max_iterations,
                 early_stopping_method="generate"
             )
+            print("✓ Using STRUCTURED_CHAT agent")
         except Exception as e:
             print(f"Error with STRUCTURED_CHAT: {e}")
             # Fallback to ZERO_SHOT_REACT_DESCRIPTION
@@ -171,11 +172,25 @@ def create_finqa_agent_with_lora(
                     max_iterations=max_iterations,
                     early_stopping_method="generate"
                 )
+                print("✓ Using ZERO_SHOT_REACT_DESCRIPTION agent")
             except Exception as e2:
                 print(f"Error with ZERO_SHOT_REACT_DESCRIPTION: {e2}")
                 raise
     else:
         raise ImportError("LangChain classic API not available. Please install langchain<0.1")
+    
+    # Ensure agent is AgentExecutor and has return_intermediate_steps enabled
+    if not isinstance(agent, AgentExecutor):
+        # Wrap if needed
+        from langchain.agents import AgentExecutor
+        if hasattr(agent, 'agent') and hasattr(agent, 'tools'):
+            agent = AgentExecutor(
+                agent=agent.agent,
+                tools=agent.tools,
+                verbose=verbose,
+                return_intermediate_steps=True,
+                max_iterations=max_iterations
+            )
     
     print("Agent created successfully!")
     return agent, model, tokenizer

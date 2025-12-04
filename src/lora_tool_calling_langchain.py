@@ -173,17 +173,22 @@ Format your tool calls as: Tool: tool_name, Arguments: a=value1, b=value2
         
         if isinstance(agent, AgentExecutor):
             # Use invoke to get intermediate steps
-            response = agent.invoke({"input": prompt})
+            response = agent.invoke({"input": prompt}, return_only_outputs=False)
             result = response.get("output", "")
+            # Get intermediate steps - they might be in different places
             intermediate_steps = response.get("intermediate_steps", [])
+            if not intermediate_steps and "intermediate_steps" in response:
+                intermediate_steps = response["intermediate_steps"]
         else:
-            # Fallback to run - try to get intermediate steps from agent
+            # Fallback - agent.run doesn't return intermediate steps directly
+            # We need to capture them from the agent's internal state
             result = agent.run(prompt)
-            # Try to extract intermediate steps from agent if available
             intermediate_steps = []
+            # Try to get from agent executor if it exists
             if hasattr(agent, 'agent_executor'):
-                if hasattr(agent.agent_executor, 'intermediate_steps'):
-                    intermediate_steps = agent.agent_executor.intermediate_steps
+                executor = agent.agent_executor
+                if hasattr(executor, 'intermediate_steps'):
+                    intermediate_steps = executor.intermediate_steps
             elif hasattr(agent, 'intermediate_steps'):
                 intermediate_steps = agent.intermediate_steps
         
@@ -199,6 +204,14 @@ Format your tool calls as: Tool: tool_name, Arguments: a=value1, b=value2
         result_str = re.sub(r'\bg\s+r\s+e\s+a\s+t\s+e\s+r\b', 'greater', result_str)
         result_str = re.sub(r'\be\s+x\s+p\b', 'exp', result_str)
         
+        # Count tool calls from intermediate steps or from output
+        tool_call_count = len(intermediate_steps)
+        if tool_call_count == 0:
+            # Try to count from output if intermediate steps not available
+            tool_call_pattern = r'(Action:|Tool:|Observation:)'
+            tool_calls_in_output = len(re.findall(tool_call_pattern, result_str, re.IGNORECASE))
+            tool_call_count = tool_calls_in_output // 2  # Each tool call has Action and Observation
+        
         predicted_answer = extract_answer_from_agent_output(result_str)
         
         return {
@@ -207,7 +220,7 @@ Format your tool calls as: Tool: tool_name, Arguments: a=value1, b=value2
             'predicted_answer': predicted_answer,
             'gold_program': ' '.join(gold_program) if isinstance(gold_program, list) else gold_program,
             'gold_answer': gold_answer,
-            'tool_calls': len(intermediate_steps),
+            'tool_calls': tool_call_count,
             'raw_output': result_str,
             'intermediate_steps': str(intermediate_steps) if intermediate_steps else ''
         }
